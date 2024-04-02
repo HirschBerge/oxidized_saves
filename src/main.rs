@@ -51,7 +51,7 @@ fn verify_settings(settings_path: &str ) -> Vec<Game> {
 }
 
 fn main() {
-    let settings = verify_settings("./test.json");
+    let settings = verify_settings("./dummy.json");
     println!("{:#?}", settings)
 }
 
