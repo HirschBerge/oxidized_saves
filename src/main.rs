@@ -76,8 +76,15 @@ fn verify_settings(settings_path: &str ) -> Vec<Game> {
 
 
 fn main() {
-    let settings = verify_settings("./dummy.json");
-    println!("{:#?}", settings)
+    let games = verify_settings("./dummy.json");
+    games.iter().for_each(|game| {
+        println!("{}", game.game_title);
+        game.saves.iter().for_each(|save|{
+            println!("{}", save.count);
+        })
+    });
+    // println!("{}",settings.into_iter());
+    // println!("{:#?}", settings)
 }
 
 // Ai Tests
