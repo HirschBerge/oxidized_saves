@@ -16,16 +16,28 @@ struct Game {
     saves: Vec<Save>,
 }
 impl Game {
+    /**
+    Adds a season to the Show.
+
+    # Example
+    ```
+    let mut er = Game { game_title: "Elden Ring".to_string(), steam_id: 1245620, save_path: "/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/".to_string(), publisher: "Bandai Namco".to_string(), developer: "FROM Software".to_string(), Saves: vec![] };
+    let path:String = format!("{}/{}",base_path, er.game_title);
+    er.add_save(path);
+    ```
+    # This adds the save to the game, to later make the backup.
+    */
     #[allow(dead_code)]
-    fn add_save(&self, _backup_path: String) {
+    fn add_save(&mut self,_backup_path: String) {
+        #[allow(unreachable_code)]
+        let _new_save: Save = !todo!();
         // TODO count: should be the highest save # + 1
         // TODO backup_path: include a setting for base_path +game_name + count
         // TODO production_path: implement a save selector that supports as many formats as possible then append to parent Game's save_path
         // TODO parent_game: should be easy?
-        // TODO saved_at
+        // NOTE Should this be in epoch and converted later with a TZ defined by the user, or should it be converted now?
         let _saved_at = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(); 
-        #[allow(unreachable_code)]
-        !unimplemented!()
+        self.saves.push(_new_save);
     }
 }
 #[allow(dead_code)]
