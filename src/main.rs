@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
 use std::process::exit;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
@@ -14,7 +15,19 @@ struct Game {
     developer: String,
     saves: Vec<Save>,
 }
-
+impl Game {
+    #[allow(dead_code)]
+    fn add_save(&self, _backup_path: String) {
+        // TODO count: should be the highest save # + 1
+        // TODO backup_path: include a setting for base_path +game_name + count
+        // TODO production_path: implement a save selector that supports as many formats as possible then append to parent Game's save_path
+        // TODO parent_game: should be easy?
+        // TODO saved_at
+        let _saved_at = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(); 
+        #[allow(unreachable_code)]
+        !unimplemented!()
+    }
+}
 #[allow(dead_code)]
 #[derive(Debug,Deserialize)]
 struct Save {
@@ -24,37 +37,38 @@ struct Save {
     parent_game: String,
     saved_at: String, 
 }
+
+
 fn read_settings(setting_data: &str) -> Result<Vec<Game>, serde_json::Error> {
     let mut file = File::open(setting_data).map_err(|e| serde_json::Error::custom(e.to_string()))?;
-    
     let mut json_data = String::new();
     file.read_to_string(&mut json_data).map_err(|e| serde_json::Error::custom(e.to_string()))?;
-
     let settings: Vec<Game> = serde_json::from_str(&json_data)?;
-    
     Ok(settings)
 }
 
 fn verify_settings(settings_path: &str ) -> Vec<Game> {
     match read_settings(settings_path) {
         Ok(settings) => {
-            // Process settings
+            // Return settings
             settings
         },
         Err(err) => {
-            // Handle error
+            // Print error and exit
             eprintln!("Error: {}", err);
             exit(1)
-            // Optionally, you can exit the program or take other actions based on the error.
         }
     }
 }
+
+
 
 fn main() {
     let settings = verify_settings("./dummy.json");
     println!("{:#?}", settings)
 }
 
+// Ai Tests
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,13 +101,10 @@ mod tests {
         // Create a temporary file to hold the JSON data
         let mut temp_file = tempfile::NamedTempFile::new().unwrap();
         temp_file.write_all(json_data.as_bytes()).unwrap();
-
         // Get the path of the temporary file
         let file_path = temp_file.path().to_str().unwrap();
-
         // Call read_settings() with the temporary file
         let result = read_settings(file_path);
-
         // Check if the result is Ok and contains the expected game title
         assert!(result.is_ok());
         let settings = result.unwrap();
@@ -124,17 +135,13 @@ mod tests {
             }
         ]
         "#;
-
         // Create a temporary file to hold the JSON data
         let mut temp_file = tempfile::NamedTempFile::new().unwrap();
         temp_file.write_all(json_data.as_bytes()).unwrap();
-
         // Get the path of the temporary file
         let file_path = temp_file.path().to_str().unwrap();
-
         // Call verify_settings() with the temporary file
         let result = verify_settings(file_path);
-
         // Check if the result contains the expected game title
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].game_title, "Test Game");
