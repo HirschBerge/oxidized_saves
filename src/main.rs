@@ -81,7 +81,7 @@ fn main() {
 games.iter().for_each(|game| {
     println!("{}", game.game_title);
     if let Some(max_save) = game.saves.iter().max_by_key(|save| save.count) {
-        println!("Max save count: {}", max_save.count);
+        println!("Total saves: {}", max_save.count);
     }
 });
     // println!("{}",settings.into_iter());
@@ -167,6 +167,40 @@ mod tests {
         assert_eq!(result[0].game_title, "Test Game");
         assert_eq!(result[0].publisher, "Test Publisher");
         assert_eq!(result[0].saves[0].count, 2);
+    }
+    #[test]
+    fn fuzz_simulate_bad_data() {
+        // TEST with other break cases. 
+        // Create dummy JSON data
+        let json_data = r#"
+        [
+            {
+                "game_title: "Test Game",
+                "steam_id": 12345,
+                "save_path": "/home/user/saves/test_game",
+                "publisher": "Test Publisher",
+                "developer": "Test Developer",
+                "saves": [
+                    {
+                        "count": 2,
+                        "backup_path": "/backups/test_game",
+                        "production_path": "/saves/test_game",
+                        "parent_game": "Test Game",
+                        "saved_at": "2024-03-30T15:00:00Z"
+                    }
+                ]
+            }
+        ]
+        "#;
+        // Create a temporary file to hold the JSON data
+        let mut temp_file = tempfile::NamedTempFile::new().unwrap();
+        temp_file.write_all(json_data.as_bytes()).unwrap();
+        // Get the path of the temporary file
+        let file_path = temp_file.path().to_str().unwrap();
+        // Call verify_settings() with the temporary file
+        let result = read_settings(file_path);
+        // Check if the result contains the expected game title
+        assert!(result.is_err());
     }
 }
 
