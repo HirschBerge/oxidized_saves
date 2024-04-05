@@ -7,7 +7,7 @@
         "developer": "Nintendo EPD",
         "saves": [
             {
-                "count": 5,
+                "count": 1,
                 "backup_path": "/backups/zelda_breath_of_the_wild",
                 "production_path": "/saves/zelda_breath_of_the_wild",
                 "parent_game": "The Legend of Zelda: Breath of the Wild",
@@ -23,7 +23,7 @@
         "developer": "Mojang Studios",
         "saves": [
             {
-                "count": 10,
+                "count": 1,
                 "backup_path": "/backups/minecraft",
                 "production_path": "/saves/minecraft",
                 "parent_game": "Minecraft",
@@ -39,7 +39,7 @@
         "developer": "Nintendo EPD",
         "saves": [
             {
-                "count": 3,
+                "count": 1,
                 "backup_path": "/backups/super_mario_odyssey",
                 "production_path": "/saves/super_mario_odyssey",
                 "parent_game": "Super Mario Odyssey",
@@ -62,7 +62,7 @@
         "developer": "CD Projekt RED",
         "saves": [
             {
-                "count": 3,
+                "count": 1,
                 "backup_path": "/backups/witcher3",
                 "production_path": "/saves/witcher3",
                 "parent_game": "The Witcher 3: Wild Hunt",
@@ -101,7 +101,7 @@
         "developer": "CD Projekt RED",
         "saves": [
             {
-                "count": 4,
+                "count": 1,
                 "backup_path": "/backups/cyberpunk2077",
                 "production_path": "/saves/cyberpunk2077",
                 "parent_game": "Cyberpunk 2077",
