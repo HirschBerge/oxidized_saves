@@ -31,7 +31,8 @@ impl Game {
     fn add_save(&mut self,_backup_path: String) {
         #[allow(unreachable_code)]
         let _new_save: Save = !todo!();
-        // TODO count: should be the highest save # + 1
+        // NOTE Is this the most efficient manner to get the count?
+        let _count = self.saves.iter().max_by_key(|save| save.count).map(|save| save.count + 1).unwrap_or(0);
         // TODO backup_path: include a setting for base_path +game_name + count
         // TODO production_path: implement a save selector that supports as many formats as possible then append to parent Game's save_path
         // TODO parent_game: should be easy?
@@ -77,12 +78,12 @@ fn verify_settings(settings_path: &str ) -> Vec<Game> {
 
 fn main() {
     let games = verify_settings("./dummy.json");
-    games.iter().for_each(|game| {
-        println!("{}", game.game_title);
-        game.saves.iter().for_each(|save|{
-            println!("{}", save.count);
-        })
-    });
+games.iter().for_each(|game| {
+    println!("{}", game.game_title);
+    if let Some(max_save) = game.saves.iter().max_by_key(|save| save.count) {
+        println!("Max save count: {}", max_save.count);
+    }
+});
     // println!("{}",settings.into_iter());
     // println!("{:#?}", settings)
 }
@@ -164,6 +165,8 @@ mod tests {
         // Check if the result contains the expected game title
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].game_title, "Test Game");
+        assert_eq!(result[0].publisher, "Test Publisher");
+        assert_eq!(result[0].saves[0].count, 2);
     }
 }
 
