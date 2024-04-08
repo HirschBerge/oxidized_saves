@@ -18,6 +18,7 @@ The development of Oxidized Save Manager will be divided into the following mile
 
 
 ### Milestone 1: Backup and Restore Functionality
+- [x] Build the core data structs for Settings, Game, and Save
 - [ ] Implement core logic for backup and restore operations.
 - [ ] Integrate with file system for saving and loading game files.
 - [ ] Test backup and restore functionality with sample game saves.
@@ -52,6 +53,7 @@ Here's a breakdown of tasks to be completed for each milestone:
 ### Milestone 1: Backup and Restore Functionality
 | Task                              | Issue/PR |         Description                           | Status      |
 |-----------------------------------|----------|-----------------------------------------------|-------------|
+| Build out core Data structs       | [#1](https://github.com/HirschBerge/oxidized_saves/pull/1)| Build out the Settings, Game, and Save structs| Merged     |
 | Implement backup logic            | N/A      | Develop code for backing up game saves        | In Progress |
 | Implement restore logic           | N/A      | Develop code for restoring game saves         | Not Started |
 | Test backup and restore           | N/A      | Verify functionality with sample game saves   | Not Started |
