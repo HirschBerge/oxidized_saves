@@ -3,7 +3,7 @@ use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH};
+use chrono::Local;
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize, PartialEq)]
@@ -36,27 +36,31 @@ impl Game {
     # This adds the save to the game, to later make the backup.
     */
     #[allow(dead_code)]
-    fn add_save(&mut self, _backup_path: String, settings_path: &String) {
+    fn add_save(&mut self, production_path: PathBuf, settings_path: &PathBuf) {
         // NOTE Is this the most efficient manner to get the count?
-        let _count = self
+        let count = self
             .saves
             .iter()
             .max_by_key(|save| save.count)
             .map(|save| save.count + 1)
             .unwrap_or(0);
         // NOTE parent_game: helps backup_path
-        let _parent_game = self.game_title.clone();
+        let parent_game = self.game_title.clone();
         // NOTE  backup_path: simply a path made up of the path defined in your settings, the name of the game, and the count of the settings.
-        let _backup_path: PathBuf = PathBuf::from(format!("{}/{}/{}", settings_path, &_parent_game, &_count));
-        // TODO production_path: implement a save selector that supports as many formats as possible then append to parent Game's save_path
+        let backup_path: PathBuf = PathBuf::from(format!("{}/{}/{}", settings_path.to_str().unwrap_or("/home/user/"), &parent_game, &count));
         // NOTE Should this be in epoch and converted later with a TZ defined by the user, or should it be converted now?
-        let _saved_at = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let saved_at = Local::now().naive_local().format("%Y-%m-%dT%H:%M:%SZ").to_string();
         #[allow(unreachable_code)]
-        let _new_save: Save = !todo!();
-        self.saves.push(_new_save);
+        let new_save: Save = Save {
+        count,
+        backup_path,
+        production_path,
+        parent_game,
+        saved_at,
+    };
+        // dbg!(&new_save);
+        // println!("{:?}", new_save);
+        self.saves.push(new_save);
     }
 }
 #[allow(dead_code)]
@@ -108,15 +112,18 @@ fn main() {
     let settings_file = home_dir.join(".config/oxi/oxi.json");
     let prog_settings: &Settings = &verify_conf::<Vec<Settings>>(settings_file)[0];
     println!("{:?}", prog_settings);
-    let games: Vec<Game> = verify_conf(PathBuf::from("./dummy.json"));
-    games.iter().for_each(|game| {
-        println!("{}\n{:?}", game.game_title, game.save_path);
-        if let Some(max_save) = game.saves.iter().max_by_key(|save| save.count) {
-            println!("Total saves: {}", max_save.count);
-        }
-    });
-    // println!("{}",settings.into_iter());
-    // println!("{:#?}", settings)
+    let mut games: Vec<Game> = verify_conf(PathBuf::from("./dummy.json"));
+    println!("Before:");
+    dbg!(&games[0]);
+    games[0].add_save(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/292030/"), &prog_settings.save_base_path);
+    println!("After:");
+    dbg!(&games[0]);
+    // games.iter().for_each(|game| {
+    //     println!("{}\n{:?}", game.game_title, game.save_path);
+    //     if let Some(max_save) = game.saves.iter().max_by_key(|save| save.count) {
+    //         println!("Total saves: {}", max_save.count);
+    //     }
+    // });
 }
 
 // Ai Tests
