@@ -5,7 +5,6 @@ use std::io::Read;
 use std::path::PathBuf;
 use chrono::Local;
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize, PartialEq)]
 struct Settings {
     save_base_path: PathBuf,
@@ -35,7 +34,6 @@ impl Game {
     ```
     # This adds the save to the game, to later make the backup.
     */
-    #[allow(dead_code)]
     fn add_save(&mut self, production_path: PathBuf, settings_path: &PathBuf) {
         // NOTE Is this the most efficient manner to get the count?
         let count = self
@@ -50,7 +48,6 @@ impl Game {
         let backup_path: PathBuf = PathBuf::from(format!("{}/{}/{}", settings_path.to_str().unwrap_or("/home/user/"), &parent_game, &count));
         // NOTE Should this be in epoch and converted later with a TZ defined by the user, or should it be converted now?
         let saved_at = Local::now().naive_local().format("%Y-%m-%dT%H:%M:%SZ").to_string();
-        #[allow(unreachable_code)]
         let new_save: Save = Save {
         count,
         backup_path,
