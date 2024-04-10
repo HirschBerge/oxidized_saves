@@ -2,7 +2,7 @@ use serde::de::{DeserializeOwned, Error};
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use chrono::Local;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -28,13 +28,13 @@ impl Game {
 
     # Example
     ```
-    let mut er = Game { game_title: "Elden Ring".to_string(), steam_id: 1245620, save_path: "/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/".to_string(), publisher: "Bandai Namco".to_string(), developer: "FROM Software".to_string(), Saves: vec![] };
+    let mut er = Game { game_title: "Elden Ring".to_string(), steam_id: 1245620, save_path: PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/"), publisher: "Bandai Namco".to_string(), developer: "FROM Software".to_string(), Saves: vec![] };
     let path:String = format!("{}/{}",base_path, er.game_title);
     er.add_save(path);
     ```
     # This adds the save to the game, to later make the backup.
     */
-    fn add_save(&mut self, production_path: PathBuf, settings_path: &PathBuf) {
+    fn add_save(&mut self, production_path: PathBuf, settings_path: &Path) {
         // NOTE Is this the most efficient manner to get the count?
         let count = self
             .saves
@@ -115,12 +115,6 @@ fn main() {
     games[0].add_save(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/292030/"), &prog_settings.save_base_path);
     println!("After:");
     dbg!(&games[0]);
-    // games.iter().for_each(|game| {
-    //     println!("{}\n{:?}", game.game_title, game.save_path);
-    //     if let Some(max_save) = game.saves.iter().max_by_key(|save| save.count) {
-    //         println!("Total saves: {}", max_save.count);
-    //     }
-    // });
 }
 
 // Ai Tests
@@ -148,7 +142,7 @@ mod tests {
         let settings_file_path = temp_dir.path().join("oxi_bad.json");
 
         // Write the settings content to the file
-        std::fs::write(&settings_file_path, settings_content)
+        std::fs::write(settings_file_path, settings_content)
             .expect("Failed to write settings file");
 
         // Mock the home directory to the temporary directory
