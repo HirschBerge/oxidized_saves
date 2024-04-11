@@ -33,6 +33,7 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             rustToolchain
+            cargo-flamegraph
             openssl
             pkg-config
             cargo-deny
