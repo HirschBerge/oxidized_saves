@@ -1,19 +1,20 @@
 use serde::de::{DeserializeOwned, Error};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use chrono::Local;
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 struct Settings {
     save_base_path: PathBuf,
+    game_conf_path: PathBuf,
     color_scheme: String,
     delete_on_restore: bool,
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Game {
     game_title: String,
     steam_id: u32,
@@ -55,19 +56,30 @@ impl Game {
         parent_game,
         saved_at,
     };
-        // dbg!(&new_save);
-        // println!("{:?}", new_save);
         self.saves.push(new_save);
     }
 }
 #[allow(dead_code)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Save {
     count: u8,
     backup_path: PathBuf,
     production_path: PathBuf,
     parent_game: String,
     saved_at: String,
+}
+fn write_conf<T>(conf: Vec<T>, pth: &Path)
+// fn write_conf<T>(conf: Vec<T>, pth: PathBuf -> serde_json::Result<()>) 
+where
+    T: Serialize,
+{
+    if let Ok(out_file) = File::create(pth){
+        if let Err(err) = serde_json::to_writer(out_file, &conf){
+            eprintln!("Oh noes: {}",err);
+        }
+    }else if let Err(err) = File::create(pth) {
+        eprintln!("Error creating file {:?}: {}", pth, err);
+    }
 }
 
 fn read_conf<T>(conf_data: PathBuf) -> Result<T, serde_json::Error>
@@ -106,15 +118,13 @@ fn main() {
         }
     };
     // Append the relative path to the user's home directory
-    let settings_file = home_dir.join(".config/oxi/oxi.json");
-    let prog_settings: &Settings = &verify_conf::<Vec<Settings>>(settings_file)[0];
-    println!("{:?}", prog_settings);
-    let mut games: Vec<Game> = verify_conf(PathBuf::from("./dummy.json"));
-    println!("Before:");
-    dbg!(&games[0]);
+    let settings_file = &home_dir.join(".config/oxi/oxi.json");
+    let prog_settings: &Settings = &verify_conf::<Vec<Settings>>(settings_file.to_path_buf())[0];
+    // println!("{:?}", prog_settings);
+    let game_conf_path = PathBuf::from(format!("{}/{}conf.json",home_dir.to_string_lossy(), prog_settings.game_conf_path.to_string_lossy()));
+    let mut games: Vec<Game> = verify_conf(game_conf_path.clone());
     games[0].add_save(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/292030/"), &prog_settings.save_base_path);
-    println!("After:");
-    dbg!(&games[0]);
+    write_conf(games, &game_conf_path);
 }
 
 // Ai Tests
@@ -133,6 +143,7 @@ mod tests {
         let settings_content = r#"[
             {
                 "save_base_path": "/path/to/save",
+                "game_conf_path": ".config/oxi/",
                 "color_scheme": "dark",
                 "delete_on_restore": false
             }
@@ -158,6 +169,7 @@ mod tests {
         // Define the expected settings
         let expected_settings = Settings {
             save_base_path: PathBuf::from("/path/to/save"),
+            game_conf_path: PathBuf::from(".config/oxi/"),
             color_scheme: String::from("dark"),
             delete_on_restore: false,
         };
