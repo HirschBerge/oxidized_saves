@@ -1,6 +1,6 @@
 use core::panic;
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
@@ -22,11 +22,52 @@ impl SteamGame {
             self.thumbnail.to_string_lossy()
         );
     }
-    // Write function that takes self.app_id and uses it to locate the compatdata path
+    /**
+    # Usecase
+    Generates a `Option<PathBuf>` that represents the Proton C Drive which can be used as a starting location when selecting a save path.
+    */
     #[allow(dead_code)]
-    fn find_compatdata(&self) {}
+    fn find_compatdata(&self) -> Option<PathBuf> {
+        let home_dir = gen_home().unwrap();
+        let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
+        let steam_paths = extract_steampath(steam_lib);
+        for path in steam_paths{
+            let combined_path = path.join(format!("compatdata/{}/pfx/drive_c/", self.app_id));
+            if let Ok(_meta) = fs::metadata(&combined_path){
+                return Some(combined_path);
+            }
+        }
+    Some(home_dir)
+    }
 }
-
+/**
+  Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
+ 
+  # Arguments
+ 
+   `thumb_path` - A reference to the directory containing game thumbnails.
+   `reader` - A buffered reader for the .acf file.
+ 
+  # Returns
+ 
+  A tuple containing the extracted information: `(app_id, thumbnail, game_name)`.
+  Each item in the tuple is an `Option`:
+  - `app_id`: The Steam application ID.
+  - `thumbnail`: The path to the game thumbnail.
+  - `game_name`: The name of the game.
+ 
+  # Examples
+ 
+  ```
+  use std::path::Path;
+  use std::fs::File;
+  use std::io::BufReader;
+  let thumb_path = Path::new("/path/to/thumbnails");
+  let file = File::open("/path/to/game.acf").expect("Failed to open file");
+  let reader = BufReader::new(file);
+  let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+  ```
+ */
 fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, Option<PathBuf>, Option<String>) {
     // Initiate variables for SteamGame
     let mut app_id: Option<u64> = None;
@@ -60,8 +101,26 @@ fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, 
     (app_id, thumbnail, game_name)
 }
 
+/** Returns a vector of `SteamGame` instances parsed from .acf files in the specified directory.
 
+ # Arguments
 
+  `directory_path` - A reference to the directory containing .acf files.
+  `thumb_path` - A reference to the directory containing game thumbnails.
+
+ # Returns
+
+ An `Option` containing a vector of `SteamGame` instances if successful, or `None` if an error occurs.
+
+ # Examples
+
+ ```
+ use std::path::Path;
+ let directory_path = Path::new("/path/to/directory");
+ let thumb_path = Path::new("/path/to/thumbnails");
+ let steam_games = return_steamgames(directory_path, thumb_path);
+ ```
+**/
 fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<SteamGame>> {
     let mut steamgames: Vec<SteamGame> = Vec::new();
     // Iterate over the entries in the directory
@@ -104,8 +163,24 @@ fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<Ste
         }
     }
 }
+/**
+Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
 
+# Arguments
 
+- `thumb_path` - A reference to the directory containing game thumbnails.
+- `reader` - A buffered reader for the .acf file.
+
+# Returns
+
+A tuple containing the extracted information: `(app_id, thumbnail, game_name)`.
+Each item in the tuple is an `Option`:
+- `app_id`: The Steam application ID.
+- `thumbnail`: The path to the game thumbnail.
+- `game_name`: The name of the game.
+
+# Examples
+**/
 fn read_file(path: PathBuf) -> File {
     // Open the file
     match File::open(path) {
@@ -116,8 +191,27 @@ fn read_file(path: PathBuf) -> File {
         }
     }
 }
+/**
+Parses a file to extract Steam library paths.
 
-fn extract_steampath(path: PathBuf, thumb_path: PathBuf) -> Vec<SteamGame> {
+# Arguments
+
+- `path` - The path to the file containing Steam library information.
+
+# Returns
+
+A vector containing the extracted Steam library paths.
+
+# Examples
+
+use std::path::PathBuf;
+let path = PathBuf::from("/path/to/library.txt");
+let libraries = extract_steampath(path);
+
+rust
+
+*/
+fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
     // Create a vector to store the extracted data
     let mut extracted_libraries: Vec<PathBuf> = Vec::new();
     let file = read_file(path);
@@ -127,9 +221,13 @@ fn extract_steampath(path: PathBuf, thumb_path: PathBuf) -> Vec<SteamGame> {
         if line.contains("path") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             let cleaned_path = parts[1].trim_matches(|c| c == '"' || c == '\'');
-            extracted_libraries.push(PathBuf::from(format!("{}/steamapps", cleaned_path)));
+            extracted_libraries.push(PathBuf::from(format!("{}/steamapps/", cleaned_path)));
         }
     }
+    extracted_libraries
+}
+
+fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) -> Vec<SteamGame> {
     let mut combined_steamgames: Vec<SteamGame> = Vec::new();
     for libraries in &extracted_libraries {
         if let Some(steamgames) = return_steamgames(libraries, &thumb_path) {
@@ -141,19 +239,29 @@ fn extract_steampath(path: PathBuf, thumb_path: PathBuf) -> Vec<SteamGame> {
     }
     combined_steamgames
 }
-
-pub fn discover_steamgames() {
-    let home_dir = match dirs::home_dir() {
-        Some(path) => path,
+/**
+# Usecase
+Just Generates an expanded ~/
+*/
+fn gen_home() -> Option<PathBuf> {
+    match dirs::home_dir() {
+        Some(path) => Some(path),
         None => {
             println!("Unable to determine home directory.");
-            return;
+            None
         }
-    };
+    }
+}
+
+pub fn discover_steamgames() {
+    let home_dir = gen_home().unwrap();
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
-    let mut libraries = extract_steampath(steam_lib, steam_thumb);
+    let steam_paths = extract_steampath(steam_lib.clone());
+    let mut libraries = combine_steampaths(steam_paths, steam_thumb);
     println!("\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!", libraries.len());
     libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
-    libraries.iter().for_each(|game| game.print_info());
+    libraries.iter().for_each(|game| 
+        game.print_info()
+    );
 }
