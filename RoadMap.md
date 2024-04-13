@@ -34,10 +34,11 @@ The development of Oxidized Save Manager will be divided into the following mile
 - [ ] Ensure compatibility with various game save formats.
 
 ### Milestone 4: Pull game library/images from Steam
-- [ ] Pull list of games from SteamDB
-- [ ] Pull out the game icons from the Steam db
+- [X] Pull list of games from SteamDB
+- [X] Pull out the game icons from the Steam db
 - [ ] Present images and games
 - [ ] Possibly show a compatibility indicator.
+- [ ] Possibly show a ProtonDB indicator.
 
 ### Milestone 5: Advanced Features
 - [ ] Add automatic backup scheduling feature.
