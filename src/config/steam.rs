@@ -16,12 +16,15 @@ struct SteamGame {
 impl SteamGame {
     fn print_info(&self) {
         println!(
-            "Title: {}\nApp ID: {}\nPath to Icon: {}\n",
-            self.game_name,
+            "\x1b[35mTitle\x1b[31m: {}\n\x1b[35mApp ID\x1b[34m: {}\n\x1b[35mPath to Icon\x1b[32m: {}\n",
+            self.game_name, 
             self.app_id,
             self.thumbnail.to_string_lossy()
-        )
+        );
     }
+    // Write function that takes self.app_id and uses it to locate the compatdata path
+    #[allow(dead_code)]
+    fn find_compatdata(&self) {}
 }
 
 
@@ -143,8 +146,7 @@ pub fn discover_steamgames() {
     };
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
-    let libraries = extract_steampath(steam_lib, steam_thumb);
-    for game in libraries{
-        game.print_info();
-    }
+    let mut libraries = extract_steampath(steam_lib, steam_thumb);
+    libraries.sort_by(|a, b| a.app_id.cmp(&b.app_id));
+    libraries.iter().for_each(|game| game.print_info());
 }
