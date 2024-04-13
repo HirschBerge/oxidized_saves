@@ -35,7 +35,7 @@ fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, 
     // Loop over the lines in the acf file
     for line in reader.lines().map_while(Result::ok) {
         // Pull out the app_id and generate the path for the thumbnail
-        if line.contains("appid") {
+        if line.contains("\"appid\"") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 2 {
                 app_id = parts[1]
@@ -50,7 +50,7 @@ fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, 
                 }
             }
             // Get the game_name
-        } else if line.contains("name") {
+        } else if line.contains("\"name\"") {
             let parts: Vec<&str> = line.split('"').collect();
             if parts.len() >= 3 {
                 game_name = Some(parts[3].to_string());
@@ -153,6 +153,7 @@ pub fn discover_steamgames() {
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
     let mut libraries = extract_steampath(steam_lib, steam_thumb);
-    libraries.sort_by(|a, b| a.app_id.cmp(&b.app_id));
+    println!("\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!", libraries.len());
+    libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
     libraries.iter().for_each(|game| game.print_info());
 }
