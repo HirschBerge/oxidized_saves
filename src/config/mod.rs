@@ -1,4 +1,5 @@
 pub mod game;
+pub mod steam;
 pub mod save;
 use std::fs::File;
 

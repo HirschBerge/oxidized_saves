@@ -1,9 +1,8 @@
 mod settings;
 use std::path::PathBuf;
-
 use settings::Settings;
 mod config;
-use config::{game::Game, verify_conf, write_conf};
+use config::{game::Game, steam::discover_steamgames, verify_conf, write_conf};
 
 
 fn main() {
@@ -23,6 +22,7 @@ fn main() {
     let mut games: Vec<Game> = verify_conf(game_conf_path.clone());
     games[0].add_save(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/292030/"), &prog_settings.save_base_path);
     write_conf(games, &game_conf_path);
+    discover_steamgames();
 }
 
 // Ai Tests
