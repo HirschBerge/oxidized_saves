@@ -16,7 +16,7 @@ struct SteamGame {
 impl SteamGame {
     fn print_info(&self) {
         println!(
-            "\x1b[35mTitle\x1b[31m: {}\n\x1b[35mApp ID\x1b[34m: {}\n\x1b[35mPath to Icon\x1b[32m: {}\n",
+            "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon\x1b[32m: {}\n",
             self.game_name, 
             self.app_id,
             self.thumbnail.to_string_lossy()
@@ -26,6 +26,40 @@ impl SteamGame {
     #[allow(dead_code)]
     fn find_compatdata(&self) {}
 }
+
+fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, Option<PathBuf>, Option<String>) {
+    // Initiate variables for SteamGame
+    let mut app_id: Option<u64> = None;
+    let mut thumbnail: Option<PathBuf> = None;
+    let mut game_name: Option<String> = None;
+    // Loop over the lines in the acf file
+    for line in reader.lines().map_while(Result::ok) {
+        // Pull out the app_id and generate the path for the thumbnail
+        if line.contains("appid") {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 {
+                app_id = parts[1]
+                    .trim_matches(|c| c == '"' || c == '\'')
+                    .parse()
+                    .ok();
+                if let Some(id) = app_id {
+                    thumbnail = Some(
+                        thumb_path
+                            .join(format!("{}_library_600x900.jpg", id)),
+                    );
+                }
+            }
+            // Get the game_name
+        } else if line.contains("name") {
+            let parts: Vec<&str> = line.split('"').collect();
+            if parts.len() >= 3 {
+                game_name = Some(parts[3].to_string());
+            }
+        }
+    }
+    (app_id, thumbnail, game_name)
+}
+
 
 
 fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<SteamGame>> {
@@ -40,35 +74,7 @@ fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<Ste
                         let the_file = File::open(entry.path());
                         if let Ok(the_file) = the_file {
                             let reader = BufReader::new(the_file);
-                            // Initiate variables for SteamGame
-                            let mut app_id: Option<u64> = None;
-                            let mut thumbnail: Option<PathBuf> = None;
-                            let mut game_name: Option<String> = None;
-                            // Loop over the lines in the acf file
-                            for line in reader.lines().map_while(Result::ok) {
-                                // Pull out the app_id and generate the path for the thumbnail
-                                if line.contains("appid") {
-                                    let parts: Vec<&str> = line.split_whitespace().collect();
-                                    if parts.len() >= 2 {
-                                        app_id = parts[1]
-                                            .trim_matches(|c| c == '"' || c == '\'')
-                                            .parse()
-                                            .ok();
-                                        if let Some(id) = app_id {
-                                            thumbnail = Some(
-                                                thumb_path
-                                                    .join(format!("{}_library_600x900.jpg", id)),
-                                            );
-                                        }
-                                    }
-                                    // Get the game_name
-                                } else if line.contains("name") {
-                                    let parts: Vec<&str> = line.split('"').collect();
-                                    if parts.len() >= 3 {
-                                        game_name = Some(parts[3].to_string());
-                                    }
-                                }
-                            }
+                            let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
                             // As long as they all exist, create the struct instance
                             if let (Some(app_id), Some(thumbnail), Some(game_name)) =
                                 (app_id, thumbnail, game_name)
