@@ -19,9 +19,22 @@ impl Game {
 
     # Example
     ```
-    let mut er = Game { game_title: "Elden Ring".to_string(), steam_id: 1245620, save_path: PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/"), publisher: "Bandai Namco".to_string(), developer: "FROM Software".to_string(), Saves: vec![] };
-    let path:String = format!("{}/{}",base_path, er.game_title);
-    er.add_save(path);
+    use std::path::Path;
+    use chrono::Local;
+    use oxi::config::game::Game;
+    use std::path::PathBuf;
+    
+    let settings_path: PathBuf = PathBuf::from("Documents/saves");
+    let prod_path: PathBuf = PathBuf::from("/mnt/games");
+    let mut er = Game {
+        game_title: "Elden Ring".to_string(),
+        steam_id: 1245620,
+        save_path: PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/"),
+        publisher: "Bandai Namco".to_string(),
+        developer: "FROM Software".to_string(),
+        saves: vec![],
+    };
+    er.add_save(prod_path, &settings_path);
     ```
     # This adds the save to the game, to later make the backup.
     */

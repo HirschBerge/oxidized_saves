@@ -7,7 +7,7 @@ use std::{
 
 #[allow(dead_code)]
 #[derive(Debug)]
-struct SteamGame {
+pub struct SteamGame {
     game_name: String,
     app_id: u64,
     thumbnail: PathBuf,
@@ -62,13 +62,14 @@ impl SteamGame {
   use std::path::Path;
   use std::fs::File;
   use std::io::BufReader;
-  let thumb_path = Path::new("/path/to/thumbnails");
-  let file = File::open("/path/to/game.acf").expect("Failed to open file");
+  use oxi::config::steam::parse_acf_files;
+  let thumb_path = Path::new("./Cargo.lock");
+  let file = File::open("./Cargo.toml").expect("Failed to open file");
   let reader = BufReader::new(file);
   let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
   ```
  */
-fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, Option<PathBuf>, Option<String>) {
+pub fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, Option<PathBuf>, Option<String>) {
     // Initiate variables for SteamGame
     let mut app_id: Option<u64> = None;
     let mut thumbnail: Option<PathBuf> = None;
@@ -116,12 +117,13 @@ fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, 
 
  ```
  use std::path::Path;
+ use oxi::config::steam::return_steamgames;
  let directory_path = Path::new("/path/to/directory");
  let thumb_path = Path::new("/path/to/thumbnails");
  let steam_games = return_steamgames(directory_path, thumb_path);
  ```
 **/
-fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<SteamGame>> {
+pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<SteamGame>> {
     let mut steamgames: Vec<SteamGame> = Vec::new();
     // Iterate over the entries in the directory
     match std::fs::read_dir(directory_path) {
@@ -203,15 +205,14 @@ Parses a file to extract Steam library paths.
 A vector containing the extracted Steam library paths.
 
 # Examples
-
+```
 use std::path::PathBuf;
-let path = PathBuf::from("/path/to/library.txt");
+use oxi::config::steam::extract_steampath;
+let path = PathBuf::from("./Cargo.toml");
 let libraries = extract_steampath(path);
-
-rust
-
+```
 */
-fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
+pub fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
     // Create a vector to store the extracted data
     let mut extracted_libraries: Vec<PathBuf> = Vec::new();
     let file = read_file(path);
