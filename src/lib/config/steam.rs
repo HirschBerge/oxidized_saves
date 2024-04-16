@@ -28,7 +28,7 @@ impl SteamGame {
     */
     #[allow(dead_code)]
     fn find_compatdata(&self) -> Option<PathBuf> {
-        let home_dir = gen_home().unwrap();
+        let home_dir = gen_home().expect("All OSes should have a home directory.");
         let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
         let steam_paths = extract_steampath(steam_lib);
         for path in steam_paths{
@@ -255,7 +255,7 @@ fn gen_home() -> Option<PathBuf> {
 }
 
 pub fn discover_steamgames() {
-    let home_dir = gen_home().unwrap();
+    let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
     let steam_paths = extract_steampath(steam_lib.clone());

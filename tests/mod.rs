@@ -76,15 +76,15 @@ mod tests {
         ]
         "#;
         // Create a temporary file to hold the JSON data
-        let mut temp_file = tempfile::NamedTempFile::new().unwrap();
-        temp_file.write_all(json_data.as_bytes()).unwrap();
+        let mut temp_file = tempfile::NamedTempFile::new().expect("A valid temp file.");
+        temp_file.write_all(json_data.as_bytes()).expect("If this is failing. Why isn't the line above failing first?");
         // Get the path of the temporary file
-        let file_path = PathBuf::from(temp_file.path().to_str().unwrap());
+        let file_path = PathBuf::from(temp_file.path().to_str().expect("If this is failing, the two lines above should panic too."));
         // Call read_settings() with the temporary file
         let result = read_conf(file_path);
         // Check if the result is Ok and contains the expected game title
         assert!(result.is_ok());
-        let settings: Vec<Game> = result.unwrap();
+        let settings: Vec<Game> = result.expect("If this is panicing, the assert above should have triggered first. Why?");
         assert_eq!(settings.len(), 1);
         assert_eq!(settings[0].game_title, "Test Game");
     }
@@ -113,10 +113,10 @@ mod tests {
         ]
         "#;
         // Create a temporary file to hold the JSON data
-        let mut temp_file = tempfile::NamedTempFile::new().unwrap();
-        temp_file.write_all(json_data.as_bytes()).unwrap();
+        let mut temp_file = tempfile::NamedTempFile::new().expect("Why would a temp file not be able to be created?");
+        temp_file.write_all(json_data.as_bytes()).expect("If this panics, why didn't the line above?");
         // Get the path of the temporary file
-        let file_path = PathBuf::from(temp_file.path().to_str().unwrap());
+        let file_path = PathBuf::from(temp_file.path().to_str().expect("This is the third expect. This shouldn't be the one panicking."));
         // Call verify_settings() with the temporary file
         let result: Vec<Game> = verify_conf(file_path);
         // Check if the result contains the expected game title
@@ -151,10 +151,10 @@ mod tests {
         ]
         "#;
         // Create a temporary file to hold the JSON data
-        let mut temp_file = tempfile::NamedTempFile::new().unwrap();
-        temp_file.write_all(json_data.as_bytes()).unwrap();
+        let mut temp_file = tempfile::NamedTempFile::new().expect("Why does creating a tempfile panicK?");
+        temp_file.write_all(json_data.as_bytes()).expect("A temp file should never panic");
         // Get the path of the temporary file
-        let file_path = PathBuf::from(temp_file.path().to_str().unwrap());
+        let file_path = PathBuf::from(temp_file.path().to_str().expect("There are two expects before this. WTF?"));
         // Test to see if it returns an error or not. If it returns an error, this test is a successful fuzz and passes.
         assert_matches!(read_conf::<Vec<Game>>(file_path), Err(_)); // Check if an error is returned
     }
