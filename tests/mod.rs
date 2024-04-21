@@ -128,7 +128,7 @@ mod tests {
 
     #[test]
     fn fuzz_simulate_bad_data() {
-        // TEST with other break cases.
+        // TEST: with other break cases.
         // Create dummy JSON data
         let json_data = r#"
         [
