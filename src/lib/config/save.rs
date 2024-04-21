@@ -11,3 +11,15 @@ pub struct Save {
     pub parent_game: String,
     pub saved_at: String,
 }
+// impl Save {
+//     // TODO: Implment method to backup a specific save. 
+//     fn backup(self) {
+//         !todo!();
+//         
+//     }
+//     // TODO: Implment method to restore a specific save.
+//     fn restore(self) {
+//         !todo!();
+//         
+//     }
+// }
