@@ -1,10 +1,7 @@
 pub mod game;
 pub mod steam;
 pub mod save;
-use std::fs::File;
-
-use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::{fs::File, io::Read, path::{Path, PathBuf}};
 use serde::{de::{DeserializeOwned, Error}, Serialize};
 
 pub fn write_conf<T>(conf: Vec<T>, pth: &Path)

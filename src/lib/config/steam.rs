@@ -193,6 +193,7 @@ fn read_file(path: PathBuf) -> File {
         }
     }
 }
+
 /**
 Parses a file to extract Steam library paths.
 
@@ -244,7 +245,7 @@ fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) ->
 # Usecase
 Just Generates an expanded ~/
 */
-fn gen_home() -> Option<PathBuf> {
+pub fn gen_home() -> Option<PathBuf> {
     match dirs::home_dir() {
         Some(path) => Some(path),
         None => {
