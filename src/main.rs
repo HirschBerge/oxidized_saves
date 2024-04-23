@@ -32,8 +32,8 @@ fn main() {
         if let Some(new_save) = tw3.saves.last_mut() {
             // TEST: commenting out the actual backup/restore until i can write tests
             // so i don't back bacon ruining my storage space.
-            // new_save.backup();
-            // new_save.restore();
+            new_save.backup();
+            new_save.restore();
         } else {
             eprintln!("No valid save found for backup.");
         }
