@@ -2,6 +2,8 @@ use std::path::{Path, PathBuf};
 use crate::config::save::Save;
 use chrono::Local;
 use serde::{Deserialize, Serialize};
+extern crate fs_extra;
+use fs_extra::dir::{copy, CopyOptions};
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -14,8 +16,34 @@ pub struct Game {
     pub saves: Vec<Save>,
 }
 impl Game {
-    // TODO: Implement method to backup all Saves attached to this game
+    // https://docs.rs/fs_extra/latest/fs_extra/dir/fn.copy.html
+    // TEST: This still needs to be tested.
+    #[allow(dead_code)]
+    fn backup_all_saves(self) {
+        let mut coptions = CopyOptions::new();
+        coptions.overwrite = true;
+        coptions.copy_inside = true;
+        for save in self.saves {
+            match copy(save.production_path, save.backup_path, &coptions){
+                Ok(_) => println!("Successfully backed up {}", self.game_title),
+                Err(err) => eprintln!("Failed to back up {} due to {}", self.game_title, err)
+            }
+        }
+    }
     // TODO: Implement method to restore all Saves attached to this game
+    #[allow(dead_code)]
+    fn restore_all_saves(self) {
+        let mut coptions = CopyOptions::new();
+        coptions.overwrite = true;
+        coptions.copy_inside = true;
+        // TODO: Before overwriting the production_path, copy that to /tmp in case of errors
+        for save in self.saves {
+            match copy(save.backup_path, save.production_path, &coptions){
+                Ok(_) => println!("Successfully restored {}", self.game_title),
+                Err(err) => eprintln!("Failed to restore {} due to {}", self.game_title, err)
+            }
+        }
+    }
     /**
     Adds a season to the Show.
 
