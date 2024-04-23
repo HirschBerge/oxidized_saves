@@ -1,19 +1,32 @@
 pub mod game;
-pub mod steam;
 pub mod save;
-use std::{fs::File, io::Read, path::{Path, PathBuf}};
-use serde::{de::{DeserializeOwned, Error}, Serialize};
+pub mod steam;
+use serde::{
+    de::{DeserializeOwned, Error},
+    Serialize,
+};
+use std::{fs::{self, File}, io::{self, Read}, path::{Path, PathBuf}};
 
+fn test_create_dir(path: &PathBuf) -> Result<(), io::Error> {
+    // Check if the directory already exists
+    if !path.exists() {
+        // Create the directory and necessary parent directories
+        fs::create_dir_all(path)?;
+        // println!("Created directory: {:?}", path);
+    } 
+
+    Ok(())
+}
 pub fn write_conf<T>(conf: Vec<T>, pth: &Path)
-// pub fn write_conf<T>(conf: Vec<T>, pth: PathBuf -> serde_json::Result<()>) 
+// pub fn write_conf<T>(conf: Vec<T>, pth: PathBuf -> serde_json::Result<()>)
 where
     T: Serialize,
 {
-    if let Ok(out_file) = File::create(pth){
-        if let Err(err) = serde_json::to_writer(out_file, &conf){
-            eprintln!("Oh noes: {}",err);
+    if let Ok(out_file) = File::create(pth) {
+        if let Err(err) = serde_json::to_writer(out_file, &conf) {
+            eprintln!("Oh noes: {}", err);
         }
-    }else if let Err(err) = File::create(pth) {
+    } else if let Err(err) = File::create(pth) {
         eprintln!("Error creating file {:?}: {}", pth, err);
     }
 }

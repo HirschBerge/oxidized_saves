@@ -32,7 +32,8 @@ impl SteamGame {
         let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
         let steam_paths = extract_steampath(steam_lib);
         for path in steam_paths{
-            let combined_path = path.join(format!("compatdata/{}/pfx/drive_c/", self.app_id));
+            // NOTE: drilling further into proton path due to too many symlinks
+            let combined_path = path.join(format!("compatdata/{}/pfx/drive_c/pfx/drive_c/users/steamuser/", self.app_id));
             if let Ok(_meta) = fs::metadata(&combined_path){
                 return Some(combined_path);
             }

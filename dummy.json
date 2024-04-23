@@ -1,113 +1,112 @@
 [
-        {
-        "game_title": "The Legend of Zelda: Breath of the Wild",
-        "steam_id": 0,
-        "save_path": "/home/user/saves/zelda_breath_of_the_wild",
-        "publisher": "Nintendo",
-        "developer": "Nintendo EPD",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/zelda_breath_of_the_wild",
-                "production_path": "/saves/zelda_breath_of_the_wild",
-                "parent_game": "The Legend of Zelda: Breath of the Wild",
-                "saved_at": "2024-03-30T15:30:00Z"
-            }
-        ]
-    },
-    {
-        "game_title": "Minecraft",
-        "steam_id": 0,
-        "save_path": "/home/user/saves/minecraft",
-        "publisher": "Mojang Studios",
-        "developer": "Mojang Studios",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/minecraft",
-                "production_path": "/saves/minecraft",
-                "parent_game": "Minecraft",
-                "saved_at": "2024-03-30T16:00:00Z"
-            }
-        ]
-    },
-    {
-        "game_title": "Super Mario Odyssey",
-        "steam_id": 0,
-        "save_path": "/home/user/saves/super_mario_odyssey",
-        "publisher": "Nintendo",
-        "developer": "Nintendo EPD",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/super_mario_odyssey",
-                "production_path": "/saves/super_mario_odyssey",
-                "parent_game": "Super Mario Odyssey",
-                "saved_at": "2024-03-30T14:00:00Z"
-            },
-            {
-                "count": 2,
-                "backup_path": "/backups/super_mario_odyssey",
-                "production_path": "/saves/super_mario_odyssey",
-                "parent_game": "Super Mario Odyssey",
-                "saved_at": "2024-03-29T12:00:00Z"
-            }
-        ]
-    },
-    {
-        "game_title": "The Witcher 3: Wild Hunt",
-        "steam_id": 292030,
-        "save_path": "/home/user/saves/witcher3",
-        "publisher": "CD Projekt",
-        "developer": "CD Projekt RED",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/witcher3",
-                "production_path": "/saves/witcher3",
-                "parent_game": "The Witcher 3: Wild Hunt",
-                "saved_at": "2024-03-30T15:00:00Z"
-            },
-            {
-                "count": 2,
-                "backup_path": "/backups/witcher3",
-                "production_path": "/saves/witcher3",
-                "parent_game": "The Witcher 3: Wild Hunt",
-                "saved_at": "2024-03-29T14:30:00Z"
-            }
-        ]
-    },
-    {
-        "game_title": "Red Dead Redemption 2",
-        "steam_id": 1174180,
-        "save_path": "/home/user/saves/red_dead_redemption2",
-        "publisher": "Rockstar Games",
-        "developer": "Rockstar Studios",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/red_dead_redemption2",
-                "production_path": "/saves/red_dead_redemption2",
-                "parent_game": "Red Dead Redemption 2",
-                "saved_at": "2024-03-30T14:45:00Z"
-            }
-        ]
-    },
-    {
-        "game_title": "Cyberpunk 2077",
-        "steam_id": 1091500,
-        "save_path": "/home/user/saves/cyberpunk2077",
-        "publisher": "CD Projekt",
-        "developer": "CD Projekt RED",
-        "saves": [
-            {
-                "count": 1,
-                "backup_path": "/backups/cyberpunk2077",
-                "production_path": "/saves/cyberpunk2077",
-                "parent_game": "Cyberpunk 2077",
-                "saved_at": "2024-03-30T13:30:00Z"
-            }
-        ]
-    }
+  {
+    "game_title": "The Witcher 3: Wild Hunt",
+    "steam_id": 292030,
+    "save_path": "/mnt/storage/SteamLibrary/steamapps/compatdata/292030/pfx/drive_c/users/steamuser/Documents/The Witcher 3/gamesaves/",
+    "publisher": "CD PROJEKT RED",
+    "developer": "CD PROJEKT RED",
+    "saves": [
+      {
+        "count": 0,
+        "backup_path": "/home/hirschy/Documents/Oxi/The Witcher 3: Wild Hunt/0",
+        "production_path": "/mnt/storage/SteamLibrary/steamapps/compatdata/292030/pfx/drive_c/users/steamuser/Documents/The Witcher 3/gamesaves/",
+        "parent_game": "The Witcher 3: Wild Hunt",
+        "saved_at": "2024-04-23T17:23:09Z"
+      }
+    ]
+  },
+  {
+    "game_title": "Minecraft",
+    "steam_id": 0,
+    "save_path": "/home/user/saves/minecraft",
+    "publisher": "Mojang Studios",
+    "developer": "Mojang Studios",
+    "saves": [
+      {
+        "count": 1,
+        "backup_path": "/backups/minecraft",
+        "production_path": "/saves/minecraft",
+        "parent_game": "Minecraft",
+        "saved_at": "2024-03-30T16:00:00Z"
+      }
+    ]
+  },
+  {
+    "game_title": "Super Mario Odyssey",
+    "steam_id": 0,
+    "save_path": "/home/user/saves/super_mario_odyssey",
+    "publisher": "Nintendo",
+    "developer": "Nintendo EPD",
+    "saves": [
+      {
+        "count": 1,
+        "backup_path": "/backups/super_mario_odyssey",
+        "production_path": "/saves/super_mario_odyssey",
+        "parent_game": "Super Mario Odyssey",
+        "saved_at": "2024-03-30T14:00:00Z"
+      },
+      {
+        "count": 2,
+        "backup_path": "/backups/super_mario_odyssey",
+        "production_path": "/saves/super_mario_odyssey",
+        "parent_game": "Super Mario Odyssey",
+        "saved_at": "2024-03-29T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "game_title": "The Witcher 3: Wild Hunt",
+    "steam_id": 292030,
+    "save_path": "/home/user/saves/witcher3",
+    "publisher": "CD Projekt",
+    "developer": "CD Projekt RED",
+    "saves": [
+      {
+        "count": 1,
+        "backup_path": "/backups/witcher3",
+        "production_path": "/saves/witcher3",
+        "parent_game": "The Witcher 3: Wild Hunt",
+        "saved_at": "2024-03-30T15:00:00Z"
+      },
+      {
+        "count": 2,
+        "backup_path": "/backups/witcher3",
+        "production_path": "/saves/witcher3",
+        "parent_game": "The Witcher 3: Wild Hunt",
+        "saved_at": "2024-03-29T14:30:00Z"
+      }
+    ]
+  },
+  {
+    "game_title": "Red Dead Redemption 2",
+    "steam_id": 1174180,
+    "save_path": "/home/user/saves/red_dead_redemption2",
+    "publisher": "Rockstar Games",
+    "developer": "Rockstar Studios",
+    "saves": [
+      {
+        "count": 1,
+        "backup_path": "/backups/red_dead_redemption2",
+        "production_path": "/saves/red_dead_redemption2",
+        "parent_game": "Red Dead Redemption 2",
+        "saved_at": "2024-03-30T14:45:00Z"
+      }
+    ]
+  },
+  {
+    "game_title": "Cyberpunk 2077",
+    "steam_id": 1091500,
+    "save_path": "/home/user/saves/cyberpunk2077",
+    "publisher": "CD Projekt",
+    "developer": "CD Projekt RED",
+    "saves": [
+      {
+        "count": 1,
+        "backup_path": "/backups/cyberpunk2077",
+        "production_path": "/saves/cyberpunk2077",
+        "parent_game": "Cyberpunk 2077",
+        "saved_at": "2024-03-30T13:30:00Z"
+      }
+    ]
+  }
 ]
-
