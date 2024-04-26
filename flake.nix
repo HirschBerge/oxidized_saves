@@ -33,11 +33,12 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             rustToolchain
+            cargo-flamegraph
             openssl
             pkg-config
             cargo-deny
             cargo-edit
-            cargo-watch
+            cargo-generate
             rust-analyzer
             bacon
           ];
