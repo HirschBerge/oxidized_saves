@@ -19,24 +19,33 @@ The development of Oxidized Save Manager will be divided into the following mile
 
 ### Milestone 1: Backup and Restore Functionality
 - [x] Build the core data structs for Settings, Game, and Save
-- [ ] Implement core logic for backup and restore operations.
-- [ ] Integrate with file system for saving and loading game files.
-- [ ] Test backup and restore functionality with sample game saves.
+- [x] Implement core logic for backup and restore operations.
+- [x] Integrate with file system for saving and loading game files.
+- [x] Test backup and restore functionality with sample game saves.
 
-### Milestone 2: Project Setup and UI Design
+### Milestone 2: Multi-game Support
+- [x] Extend the application to support multiple games.
+- [ ] Implement game selection feature in the UI.
+- [ ] Ensure compatibility with various game save formats.
+  - [ ] "Snapshot mode"
+    - Takes "snapshots" of the entire save directory 
+    - Works with every game, but uses more space.
+  - [ ] "Smart" mode
+    - May need to be done on a per-game/matches regex basis
+    - Backs up certain files/folders and knows which save to replace.
+
+### Milestone 3: Project Setup and UI Design
 - [ ] Set up project structure and dependencies.
 - [ ] Design user interface layout and components.
 - [ ] Implement basic UI elements (e.g., buttons, file explorer).
-
-### Milestone 3: Multi-game Support
-- [ ] Extend the application to support multiple games.
-- [ ] Implement game selection feature in the UI.
-- [ ] Ensure compatibility with various game save formats.
+- [ ] Individual game drill-down mode.
+- [ ] Catppuccin UI themes
 
 ### Milestone 4: Pull game library/images from Steam
 - [X] Pull list of games from SteamDB
 - [X] Pull out the game icons from the Steam db
-- [ ] Present images and games
+- [X] Present images and games
+- [ ] Cleanly convert SteamGame type to Game type
 - [ ] Possibly show a compatibility indicator.
 - [ ] Possibly show a ProtonDB indicator.
 
@@ -44,6 +53,12 @@ The development of Oxidized Save Manager will be divided into the following mile
 - [ ] Add automatic backup scheduling feature.
 - [ ] Implement settings menu for customization options.
 - [ ] Enhance UI with progress indicators, notifications, etc.
+- [ ] Compress saves to save space.
+  - Compress each save, or decompress when in use, and compress otherwise?
+- [ ] First time mode
+  - [ ] On first run, and when there are issues thereafter, prompt user to setup/finish configuring broken games
+  - [ ] Prompt to update overall backup location
+  - [ ] Fill this out
 
 ### Milestone 6: Testing and Optimization
 - [ ] Conduct thorough testing for reliability and performance.
