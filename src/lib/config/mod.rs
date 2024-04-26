@@ -12,7 +12,9 @@ fn test_create_dir(path: &PathBuf) -> Result<(), io::Error> {
     if !path.exists() {
         // Create the directory and necessary parent directories
         fs::create_dir_all(path)?;
-        // println!("Created directory: {:?}", path);
+        println!("Created directory: {:?}", path);
+    }else {
+        println!("{:?} already exists!", path);
     } 
 
     Ok(())
