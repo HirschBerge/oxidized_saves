@@ -19,31 +19,53 @@ The development of Oxidized Save Manager will be divided into the following mile
 
 ### Milestone 1: Backup and Restore Functionality
 - [x] Build the core data structs for Settings, Game, and Save
-- [ ] Implement core logic for backup and restore operations.
-- [ ] Integrate with file system for saving and loading game files.
-- [ ] Test backup and restore functionality with sample game saves.
+- [x] Implement core logic for backup and restore operations.
+- [x] Integrate with file system for saving and loading game files.
+- [x] Test backup and restore functionality with sample game saves.
 
-### Milestone 2: Project Setup and UI Design
+### Milestone 2: Multi-game Support
+- [x] Extend the application to support multiple games.
+- [ ] Implement game selection feature in the UI.
+- [ ] Ensure compatibility with various game save formats.
+  - [ ] "Snapshot mode"
+    - Takes "snapshots" of the entire save directory 
+    - Works with every game, but uses more space.
+  - [ ] "Smart" mode
+    - May need to be done on a per-game/matches regex basis
+    - Backs up certain files/folders and knows which save to replace.
+
+### Milestone 3: Project Setup and UI Design
 - [ ] Set up project structure and dependencies.
 - [ ] Design user interface layout and components.
 - [ ] Implement basic UI elements (e.g., buttons, file explorer).
+- [ ] Individual game drill-down mode.
+- [ ] Catppuccin UI themes
 
-### Milestone 3: Multi-game Support
-- [ ] Extend the application to support multiple games.
-- [ ] Implement game selection feature in the UI.
-- [ ] Ensure compatibility with various game save formats.
+### Milestone 4: Pull game library/images from Steam
+- [X] Pull list of games from SteamDB
+- [X] Pull out the game icons from the Steam db
+- [X] Present images and games
+- [ ] Cleanly convert SteamGame type to Game type
+- [ ] Possibly show a compatibility indicator.
+- [ ] Possibly show a ProtonDB indicator.
 
-### Milestone 4: Advanced Features
+### Milestone 5: Advanced Features
 - [ ] Add automatic backup scheduling feature.
 - [ ] Implement settings menu for customization options.
 - [ ] Enhance UI with progress indicators, notifications, etc.
+- [ ] Compress saves to save space.
+  - Compress each save, or decompress when in use, and compress otherwise?
+- [ ] First time mode
+  - [ ] On first run, and when there are issues thereafter, prompt user to setup/finish configuring broken games
+  - [ ] Prompt to update overall backup location
+  - [ ] Fill this out
 
-### Milestone 5: Testing and Optimization
+### Milestone 6: Testing and Optimization
 - [ ] Conduct thorough testing for reliability and performance.
 - [ ] Optimize code for efficiency and resource usage.
 - [ ] Address any reported bugs or issues.
 
-### Milestone 6: Documentation and Release
+### Milestone 7: Documentation and Release
 - [ ] Write comprehensive documentation for users and developers.
 - [ ] Prepare for the official release of the application.
 
@@ -54,9 +76,9 @@ Here's a breakdown of tasks to be completed for each milestone:
 | Task                              | Issue/PR |         Description                           | Status      |
 |-----------------------------------|----------|-----------------------------------------------|-------------|
 | Build out core Data structs       | [#1](https://github.com/HirschBerge/oxidized_saves/pull/1)| Build out the Settings, Game, and Save structs| Merged     |
-| Implement backup logic            | N/A      | Develop code for backing up game saves        | In Progress |
-| Implement restore logic           | N/A      | Develop code for restoring game saves         | Not Started |
-| Test backup and restore           | N/A      | Verify functionality with sample game saves   | Not Started |
+| Implement backup logic            | [#2](https://github.com/HirschBerge/oxidized_saves/pull/2)     | Develop code for backing up game saves        | In Progress |
+| Implement restore logic           | [#2](https://github.com/HirschBerge/oxidized_saves/pull/2) | Develop code for restoring game saves         | In Progress |
+| Test backup and restore           | [#2](https://github.com/HirschBerge/oxidized_saves/pull/2) | Verify functionality with sample game saves   | In Progress |
 
 ### Milestone 2: Project Setup and UI Design
 | Task                              | Issue/PR          | Description                          | Status      |
