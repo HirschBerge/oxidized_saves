@@ -50,6 +50,10 @@ impl Save {
         coptions.overwrite = true;
         coptions.content_only = true;
         let start = Instant::now();
+        if let Err(err) = test_create_dir(&self.backup_path) {
+            eprintln!("Could not create path for backing up due to {}", err);
+            exit(1);
+        }
         if let Some(parent_path) = self.production_path.parent() {
             match copy(self.backup_path.clone(), parent_path, &coptions) {
                 Ok(_) => println!(
@@ -57,11 +61,7 @@ impl Save {
                     self.parent_game,
                     start.elapsed()
                 ),
-                Err(err) => eprintln!(
-                    "Failed to restore {} due to {:?}",
-                    self.parent_game,
-                    err
-                ),
+                Err(err) => eprintln!("Failed to restore {} due to {:?}", self.parent_game, err),
             }
         } else {
             // Handle the case where the parent directory cannot be determined
