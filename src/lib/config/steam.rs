@@ -86,6 +86,8 @@ pub fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u6
                     .parse()
                     .ok();
                 if let Some(id) = app_id {
+                    // TODO: There are also _icon, _logo, _hero, _hero_blur, and _header. 
+                    // I want to not have it just be the 600x900. Should just refactor to add the other images elsewhere.
                     thumbnail = Some(
                         thumb_path
                             .join(format!("{}_library_600x900.jpg", id)),
