@@ -17,7 +17,7 @@ impl SteamGame {
     fn print_info(&self) {
         println!(
             "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon\x1b[32m: {}\n",
-            self.game_name, 
+            self.game_name,
             self.app_id,
             self.thumbnail.to_string_lossy()
         );
@@ -31,46 +31,52 @@ impl SteamGame {
         let home_dir = gen_home().expect("All OSes should have a home directory.");
         let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
         let steam_paths = extract_steampath(steam_lib);
-        for path in steam_paths{
+        for path in steam_paths {
             // NOTE: drilling further into proton path due to too many symlinks
-            let combined_path = path.join(format!("compatdata/{}/pfx/drive_c/pfx/drive_c/users/steamuser/", self.app_id));
-            if let Ok(_meta) = fs::metadata(&combined_path){
+            let combined_path = path.join(format!(
+                "compatdata/{}/pfx/drive_c/pfx/drive_c/users/steamuser/",
+                self.app_id
+            ));
+            if let Ok(_meta) = fs::metadata(&combined_path) {
                 return Some(combined_path);
             }
         }
-    Some(home_dir)
+        Some(home_dir)
     }
 }
 /**
-  Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
- 
-  # Arguments
- 
-   `thumb_path` - A reference to the directory containing game thumbnails.
-   `reader` - A buffered reader for the .acf file.
- 
-  # Returns
- 
-  A tuple containing the extracted information: `(app_id, thumbnail, game_name)`.
-  Each item in the tuple is an `Option`:
-  - `app_id`: The Steam application ID.
-  - `thumbnail`: The path to the game thumbnail.
-  - `game_name`: The name of the game.
- 
-  # Examples
- 
-  ```
-  use std::path::Path;
-  use std::fs::File;
-  use std::io::BufReader;
-  use oxi::config::steam::parse_acf_files;
-  let thumb_path = Path::new("./Cargo.lock");
-  let file = File::open("./Cargo.toml").expect("Failed to open file");
-  let reader = BufReader::new(file);
-  let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
-  ```
- */
-pub fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u64>, Option<PathBuf>, Option<String>) {
+ Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
+
+ # Arguments
+
+  `thumb_path` - A reference to the directory containing game thumbnails.
+  `reader` - A buffered reader for the .acf file.
+
+ # Returns
+
+ A tuple containing the extracted information: `(app_id, thumbnail, game_name)`.
+ Each item in the tuple is an `Option`:
+ - `app_id`: The Steam application ID.
+ - `thumbnail`: The path to the game thumbnail.
+ - `game_name`: The name of the game.
+
+ # Examples
+
+ ```
+ use std::path::Path;
+ use std::fs::File;
+ use std::io::BufReader;
+ use oxi::config::steam::parse_acf_files;
+ let thumb_path = Path::new("./Cargo.lock");
+ let file = File::open("./Cargo.toml").expect("Failed to open file");
+ let reader = BufReader::new(file);
+ let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+ ```
+*/
+pub fn parse_acf_files(
+    thumb_path: &Path,
+    reader: BufReader<File>,
+) -> (Option<u64>, Option<PathBuf>, Option<String>) {
     // Initiate variables for SteamGame
     let mut app_id: Option<u64> = None;
     let mut thumbnail: Option<PathBuf> = None;
@@ -86,12 +92,9 @@ pub fn parse_acf_files(thumb_path: &Path, reader: BufReader<File>) -> (Option<u6
                     .parse()
                     .ok();
                 if let Some(id) = app_id {
-                    // TODO: There are also _icon, _logo, _hero, _hero_blur, and _header. 
+                    // TODO: There are also _icon, _logo, _hero, _hero_blur, and _header.
                     // I want to not have it just be the 600x900. Should just refactor to add the other images elsewhere.
-                    thumbnail = Some(
-                        thumb_path
-                            .join(format!("{}_library_600x900.jpg", id)),
-                    );
+                    thumbnail = Some(thumb_path.join(format!("{}_library_600x900.jpg", id)));
                 }
             }
             // Get the game_name
@@ -138,7 +141,8 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                         let the_file = File::open(entry.path());
                         if let Ok(the_file) = the_file {
                             let reader = BufReader::new(the_file);
-                            let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+                            let (app_id, thumbnail, game_name) =
+                                parse_acf_files(thumb_path, reader);
                             // As long as they all exist, create the struct instance
                             if let (Some(app_id), Some(thumbnail), Some(game_name)) =
                                 (app_id, thumbnail, game_name)
@@ -150,7 +154,7 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                                 };
                                 match Path::new(&game.thumbnail).exists() {
                                     true => steamgames.push(game),
-                                    false => {},
+                                    false => {}
                                 }
                             }
                         } else {
@@ -264,9 +268,10 @@ pub fn discover_steamgames() {
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
     let steam_paths = extract_steampath(steam_lib.clone());
     let mut libraries = combine_steampaths(steam_paths, steam_thumb);
-    println!("\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!", libraries.len());
-    libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
-    libraries.iter().for_each(|game| 
-        game.print_info()
+    println!(
+        "\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!",
+        libraries.len()
     );
+    libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
+    libraries.iter().for_each(|game| game.print_info());
 }
