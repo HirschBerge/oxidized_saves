@@ -29,7 +29,7 @@ fn main() {
     if let Some(tw3) = games.first_mut() {
         tw3.add_save(tw3.save_path.clone(), &prog_settings.save_base_path);
         // Access the last save in the first game's `saves` vector
-        if let Some(new_save) = tw3.saves.last_mut() {
+        if let Some(_new_save) = tw3.saves.last_mut() {
             // TEST: commenting out the actual backup/restore until i can write tests
             // so i don't back bacon ruining my storage space.
             // new_save.backup();

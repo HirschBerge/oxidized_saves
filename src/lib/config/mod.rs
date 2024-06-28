@@ -5,7 +5,11 @@ use serde::{
     de::{DeserializeOwned, Error},
     Serialize,
 };
-use std::{fs::{self, File}, io::{self, Read}, path::{Path, PathBuf}};
+use std::{
+    fs::{self, File},
+    io::{self, Read},
+    path::{Path, PathBuf},
+};
 
 fn test_create_dir(path: &PathBuf) -> Result<(), io::Error> {
     // Check if the directory already exists
@@ -13,9 +17,9 @@ fn test_create_dir(path: &PathBuf) -> Result<(), io::Error> {
         // Create the directory and necessary parent directories
         fs::create_dir_all(path)?;
         println!("Created directory: {:?}", path);
-    }else {
+    } else {
         println!("{:?} already exists!", path);
-    } 
+    }
 
     Ok(())
 }
