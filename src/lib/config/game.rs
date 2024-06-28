@@ -1,7 +1,7 @@
-use std::path::{Path, PathBuf};
 use crate::config::save::Save;
 use chrono::Local;
 use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -38,7 +38,7 @@ impl Game {
     use chrono::Local;
     use oxi::config::game::Game;
     use std::path::PathBuf;
-    
+
     let settings_path: PathBuf = PathBuf::from("Documents/saves");
     let prod_path: PathBuf = PathBuf::from("/mnt/games");
     let mut er = Game {
@@ -64,16 +64,24 @@ impl Game {
         // NOTE: parent_game: helps backup_path
         let parent_game = self.game_title.clone();
         // NOTE:  backup_path: simply a path made up of the path defined in your settings, the name of the game, and the count of the settings.
-        let backup_path: PathBuf = PathBuf::from(format!("{}/{}/{}", settings_path.to_str().unwrap_or("/home/user/"), &parent_game, &count));
+        let backup_path: PathBuf = PathBuf::from(format!(
+            "{}/{}/{}",
+            settings_path.to_str().unwrap_or("/home/user/"),
+            &parent_game,
+            &count
+        ));
         // NOTE: Should this be in epoch and converted later with a TZ defined by the user, or should it be converted now?
-        let saved_at = Local::now().naive_local().format("%Y-%m-%dT%H:%M:%SZ").to_string();
+        let saved_at = Local::now()
+            .naive_local()
+            .format("%Y-%m-%dT%H:%M:%SZ")
+            .to_string();
         let new_save: Save = Save {
-        count,
-        backup_path,
-        production_path,
-        parent_game,
-        saved_at,
-    };
+            count,
+            backup_path,
+            production_path,
+            parent_game,
+            saved_at,
+        };
         self.saves.push(new_save);
     }
 }
