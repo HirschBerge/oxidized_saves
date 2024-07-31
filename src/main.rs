@@ -6,6 +6,32 @@ use oxi::config::{
 use oxi::settings::Settings;
 use std::path::PathBuf;
 
+/// .
+/// # Examples
+///```
+///    let games: Vec<Game> = verify_conf(game_conf_path.clone());
+///    let search_item: &str = "WITCHER"
+///    match search_games(&games, search_item.to_lowercase()) {
+///        Ok(search) => {
+///            println!("Title: {}\nSteam ID: {}\nSave Count: {}", search.game_title, search.steam_id, search.saves.len())
+///        }
+///        Err(err) => {
+///            eprintln!("{}", err);
+///            // Gracefully quit
+///            std::process::exit(1);
+///        }
+///    }
+///```
+/// This function will return an error if the search result is not found
+// TODO: Add searches by other metrics besides title, such as publisher or developer
+#[allow(dead_code)]
+fn search_games(games: & [Game], search: String) -> Result<&Game, &'static str> {
+    match games.iter().find(|&game| game.game_title.to_lowercase().contains(&search)) {
+        Some(game) => Ok(game),
+        None => Err("Game not found"),
+    }
+}
+
 fn main() {
     // Get the user's home directory
     let home_dir = gen_home().expect("All OSes should have a home dir??");
@@ -24,20 +50,8 @@ fn main() {
         home_dir.to_string_lossy(),
         prog_settings.game_conf_path.to_string_lossy()
     ));
-    let mut games: Vec<Game> = verify_conf(game_conf_path.clone());
-    // Modify the first game in the `games` vector
-    if let Some(tw3) = games.first_mut() {
-        tw3.add_save(tw3.save_path.clone(), &prog_settings.save_base_path);
-        // Access the last save in the first game's `saves` vector
-        if let Some(_new_save) = tw3.saves.last_mut() {
-            // TEST: commenting out the actual backup/restore until i can write tests
-            // so i don't back bacon ruining my storage space.
-            // new_save.backup();
-            // new_save.restore();
-        } else {
-            eprintln!("No valid save found for backup.");
-        }
-    }
+    let games: Vec<Game> = verify_conf(game_conf_path.clone());
+
 
     // After modifications, write the `games` vector back to the configuration file
     write_conf(games, &game_conf_path);
