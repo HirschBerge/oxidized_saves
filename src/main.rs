@@ -25,8 +25,11 @@ use std::path::PathBuf;
 /// This function will return an error if the search result is not found
 // TODO: Add searches by other metrics besides title, such as publisher or developer
 #[allow(dead_code)]
-fn search_games(games: & [Game], search: String) -> Result<&Game, &'static str> {
-    match games.iter().find(|&game| game.game_title.to_lowercase().contains(&search)) {
+fn search_games(games: &[Game], search: String) -> Result<&Game, &'static str> {
+    match games
+        .iter()
+        .find(|&game| game.game_title.to_lowercase().contains(&search))
+    {
         Some(game) => Ok(game),
         None => Err("Game not found"),
     }
@@ -51,7 +54,6 @@ fn main() {
         prog_settings.game_conf_path.to_string_lossy()
     ));
     let games: Vec<Game> = verify_conf(game_conf_path.clone());
-
 
     // After modifications, write the `games` vector back to the configuration file
     write_conf(games, &game_conf_path);

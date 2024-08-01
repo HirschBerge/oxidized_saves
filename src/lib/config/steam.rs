@@ -7,6 +7,7 @@ use std::{
 
 #[allow(dead_code)]
 #[derive(Debug)]
+// TODO: Make better interoptability with `Game`, or merge `SteamGame` and `Game` together
 pub struct SteamGame {
     game_name: String,
     app_id: u64,
