@@ -11,17 +11,18 @@ use std::{
 pub struct SteamGame {
     game_name: String,
     app_id: u64,
-    thumbnail: PathBuf,
+    thumbnail: Vec<PathBuf>,
 }
 
 impl SteamGame {
     fn print_info(&self) {
         println!(
-            "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon\x1b[32m: {}\n",
-            self.game_name,
-            self.app_id,
-            self.thumbnail.to_string_lossy()
+            "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon:",
+            self.game_name, self.app_id,
         );
+        for thumb in &self.thumbnail {
+            println!("\t\x1b[32m{}\x1b[0m", thumb.to_string_lossy());
+        }
     }
     /**
     # Usecase
@@ -43,6 +44,16 @@ impl SteamGame {
             }
         }
         Some(home_dir)
+    }
+}
+/// # Description:
+/// Contains a list of banned game titles (entirely non-game steam/proton-related tools) and, given a title, returns a `bool` based on if they are on the ban list
+fn filter_banned_games(title: &Option<String>) -> bool {
+    let banned_terms = ["Proton", "Steam Linux", "Steamworks"];
+    if let Some(ref t) = title {
+        banned_terms.iter().any(|&banned| t.contains(banned))
+    } else {
+        false
     }
 }
 /**
@@ -77,11 +88,12 @@ impl SteamGame {
 pub fn parse_acf_files(
     thumb_path: &Path,
     reader: BufReader<File>,
-) -> (Option<u64>, Option<PathBuf>, Option<String>) {
+) -> (Option<u64>, Option<Vec<PathBuf>>, Option<String>) {
     // Initiate variables for SteamGame
     let mut app_id: Option<u64> = None;
-    let mut thumbnail: Option<PathBuf> = None;
+    let mut thumbnails: Option<Vec<PathBuf>> = Some(Vec::new());
     let mut game_name: Option<String> = None;
+
     // Loop over the lines in the acf file
     for line in reader.lines().map_while(Result::ok) {
         // Pull out the app_id and generate the path for the thumbnail
@@ -93,12 +105,34 @@ pub fn parse_acf_files(
                     .parse()
                     .ok();
                 if let Some(id) = app_id {
-                    // TODO: There are also _icon, _logo, _hero, _hero_blur, and _header.
-                    // I want to not have it just be the 600x900. Should just refactor to add the other images elsewhere.
-                    thumbnail = Some(thumb_path.join(format!("{}_library_600x900.jpg", id)));
+                    let endings = [
+                        "_library_600x900.jpg",
+                        "_icon.jpg",
+                        "_logo.png",
+                        "_library_hero.jpg",
+                        "_library_hero_blur.jpg",
+                        "_header.jpg",
+                    ];
+                    if let Some(ref mut thumbs) = thumbnails {
+                        for ending in &endings {
+                            let full_path =
+                                format!("{}/{}{}", thumb_path.to_string_lossy(), id, ending);
+                            match Path::new(&full_path).exists() {
+                                true => thumbs.push(Path::new(&full_path).to_path_buf()),
+                                false => {
+                                    let home_dir = gen_home()
+                                        .expect("All OSes should have a home directory!??");
+                                    thumbs.push(
+                                        Path::new(&home_dir.join(".config/oxi/placeholder.png"))
+                                            .to_path_buf(),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            // Get the game_name
+        // Get the game_name
         } else if line.contains("\"name\"") {
             let parts: Vec<&str> = line.split('"').collect();
             if parts.len() >= 3 {
@@ -106,7 +140,14 @@ pub fn parse_acf_files(
             }
         }
     }
-    (app_id, thumbnail, game_name)
+
+    if let Some(ref thumbs) = thumbnails {
+        if thumbs.is_empty() {
+            thumbnails = None;
+        }
+    }
+
+    (app_id, thumbnails, game_name)
 }
 
 /** Returns a vector of `SteamGame` instances parsed from .acf files in the specified directory.
@@ -139,11 +180,13 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                 // Check if the entry is a file with a .acf extension
                 match (entry.path().extension(), entry.file_type()) {
                     (Some(ext), Ok(file_type)) if ext == "acf" && file_type.is_file() => {
-                        let the_file = File::open(entry.path());
-                        if let Ok(the_file) = the_file {
+                        let acf_file = File::open(entry.path());
+                        if let Ok(the_file) = acf_file {
                             let reader = BufReader::new(the_file);
-                            let (app_id, thumbnail, game_name) =
-                                parse_acf_files(thumb_path, reader);
+                            let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+                            if filter_banned_games(&game_name){
+                                continue;
+                            }
                             // As long as they all exist, create the struct instance
                             if let (Some(app_id), Some(thumbnail), Some(game_name)) =
                                 (app_id, thumbnail, game_name)
@@ -153,10 +196,7 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                                     thumbnail,
                                     game_name,
                                 };
-                                match Path::new(&game.thumbnail).exists() {
-                                    true => steamgames.push(game),
-                                    false => {}
-                                }
+                                steamgames.push(game);
                             }
                         } else {
                             eprintln!("Failed to open file: {:?}", entry.path());
