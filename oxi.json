@@ -1,0 +1,8 @@
+[
+  {
+    "save_base_path": "/Documents/Saves",
+    "game_conf_path": ".config/oxi/",
+    "color_scheme": "dark",
+    "delete_on_restore": true
+  }
+]
