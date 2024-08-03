@@ -29,7 +29,7 @@
    </div>
 </h1>
 
-# Backup and restore your gave saves
+# Backup and restore your game saves
 Whether you're stuck on a hard boss and don't want to burn through your supplies, are practicing a speedrun tech, or just don't want to leave your countless hours of gameplay at the whimsy of the Steam Cloud, this project ~~will be~~ is the tool for you!
 
 Please see the [Road map](./RoadMap.md) for the status of each step that I've identified needs to take place.
