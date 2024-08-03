@@ -13,7 +13,8 @@
         "parent_game": "The Witcher 3: Wild Hunt",
         "saved_at": "2024-04-23T17:23:09Z"
       }
-    ]
+    ],
+    "thumbnail": []
   },
   {
     "game_title": "Minecraft",
@@ -29,7 +30,8 @@
         "parent_game": "Minecraft",
         "saved_at": "2024-03-30T16:00:00Z"
       }
-    ]
+    ],
+    "thumbnail": []
   },
   {
     "game_title": "Super Mario Odyssey",
@@ -52,7 +54,8 @@
         "parent_game": "Super Mario Odyssey",
         "saved_at": "2024-03-29T12:00:00Z"
       }
-    ]
+    ],
+    "thumbnail": []
   },
   {
     "game_title": "The Witcher 3: Wild Hunt",
@@ -75,7 +78,8 @@
         "parent_game": "The Witcher 3: Wild Hunt",
         "saved_at": "2024-03-29T14:30:00Z"
       }
-    ]
+    ],
+    "thumbnail": []
   },
   {
     "game_title": "Red Dead Redemption 2",
@@ -91,7 +95,8 @@
         "parent_game": "Red Dead Redemption 2",
         "saved_at": "2024-03-30T14:45:00Z"
       }
-    ]
+    ],
+    "thumbnail": []
   },
   {
     "game_title": "Cyberpunk 2077",
@@ -107,6 +112,7 @@
         "parent_game": "Cyberpunk 2077",
         "saved_at": "2024-03-30T13:30:00Z"
       }
-    ]
+    ],
+    "thumbnail": []
   }
 ]

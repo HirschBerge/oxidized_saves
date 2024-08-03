@@ -1,4 +1,5 @@
 use core::panic;
+use crate::config::game::Game;
 use std::{
     fs::{self, File},
     io::{BufRead, BufReader},
@@ -15,6 +16,16 @@ pub struct SteamGame {
 }
 
 impl SteamGame {
+    #[allow(dead_code)]
+    fn convert_to_game(&self) -> Game {
+        todo!();
+        // TODO:
+        // 1. Determine if Game struct instance with identical Game.game_title exists. 
+        //   a. If SteamGame content is identical, skip
+        //   b. If exists and not identical, update information app_id -> steam_id, thumbnail -> thumbnail
+        //   c. Else, set default info for save_path, publisher, developer, saves and then do 1.b.
+        // 
+    }
     fn print_info(&self) {
         println!(
             "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon:",

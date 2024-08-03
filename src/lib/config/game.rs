@@ -12,17 +12,17 @@ pub struct Game {
     pub publisher: String,
     pub developer: String,
     pub saves: Vec<Save>,
+    pub thumbnail: Vec<PathBuf>,
 }
 impl Game {
     // https://docs.rs/fs_extra/latest/fs_extra/dir/fn.copy.html
-    // TEST: This still needs to be tested.
+    // TEST: Write exhaustive tests
     #[allow(dead_code)]
     fn backup_all_saves(self) {
         for mut save in self.saves {
             save.backup();
         }
     }
-    // TODO: Implement method to restore all Saves attached to this game
     #[allow(dead_code)]
     fn restore_all_saves(self) {
         for mut save in self.saves {
@@ -48,6 +48,7 @@ impl Game {
         publisher: "Bandai Namco".to_string(),
         developer: "FROM Software".to_string(),
         saves: vec![],
+        thumbnail: vec![],
     };
     er.add_save(prod_path, &settings_path);
     ```
