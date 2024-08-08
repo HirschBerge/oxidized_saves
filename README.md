@@ -13,7 +13,7 @@
             <img src="https://img.shields.io/github/stars/HirschBerge/oxidized_saves?color=F5BDE6&labelColor=303446&style=for-the-badge&logo=starship&logoColor=F5BDE6">
          </a>
          <a = href="https://www.rust-lang.org/">
-            <img src="https://img.shields.io/badge/Rust-v1.77-blue.svg?style=for-the-badge&labelColor=303446&logo=Rust&logoColor=white&color=91D7E3">
+            <img src="https://img.shields.io/badge/Rust-v1.80-blue.svg?style=for-the-badge&labelColor=303446&logo=Rust&logoColor=white&color=91D7E3">
          </a>
          <a href="https://github.com/HirschBerge/oxidized_saves/">
             <img src="https://img.shields.io/github/repo-size/HirschBerge/oxidized_saves?color=C6A0F6&labelColor=303446&style=for-the-badge&logo=github&logoColor=C6A0F6">
