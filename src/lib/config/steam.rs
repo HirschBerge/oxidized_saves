@@ -1,5 +1,6 @@
 use core::panic;
 use crate::config::game::Game;
+use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, File},
     io::{BufRead, BufReader},
@@ -8,13 +9,13 @@ use std::{
 
 #[allow(dead_code)]
 #[derive(Debug)]
+#[derive(Serialize,Deserialize)]
 // TODO: Make better interoptability with `Game`, or merge `SteamGame` and `Game` together
 pub struct SteamGame {
     game_name: String,
     app_id: u64,
     thumbnail: Vec<PathBuf>,
 }
-
 impl SteamGame {
     #[allow(dead_code)]
     fn convert_to_game(&self) -> Game {
@@ -314,7 +315,7 @@ pub fn gen_home() -> Option<PathBuf> {
     }
 }
 
-pub fn discover_steamgames() {
+pub fn discover_steamgames() -> Vec<SteamGame>{
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
@@ -326,4 +327,5 @@ pub fn discover_steamgames() {
     );
     libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
     libraries.iter().for_each(|game| game.print_info());
+    libraries
 }
