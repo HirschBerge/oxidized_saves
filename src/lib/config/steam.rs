@@ -315,7 +315,7 @@ pub fn gen_home() -> Option<PathBuf> {
     }
 }
 
-pub fn discover_steamgames() -> Vec<SteamGame>{
+pub fn discover_steamgames(verbose: bool) -> Vec<SteamGame>{
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
@@ -325,7 +325,9 @@ pub fn discover_steamgames() -> Vec<SteamGame>{
         "\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!",
         libraries.len()
     );
-    libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
-    libraries.iter().for_each(|game| game.print_info());
+    if verbose {
+        libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
+        libraries.iter().for_each(|game| game.print_info());
+    }
     libraries
 }
