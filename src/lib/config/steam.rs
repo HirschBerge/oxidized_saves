@@ -1,5 +1,5 @@
-use core::panic;
 use crate::config::game::Game;
+use core::panic;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, File},
@@ -8,8 +8,7 @@ use std::{
 };
 
 #[allow(dead_code)]
-#[derive(Debug)]
-#[derive(Serialize,Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 // TODO: Make better interoptability with `Game`, or merge `SteamGame` and `Game` together
 pub struct SteamGame {
     game_name: String,
@@ -21,11 +20,11 @@ impl SteamGame {
     fn convert_to_game(&self) -> Game {
         todo!();
         // TODO:
-        // 1. Determine if Game struct instance with identical Game.game_title exists. 
+        // 1. Determine if Game struct instance with identical Game.game_title exists.
         //   a. If SteamGame content is identical, skip
         //   b. If exists and not identical, update information app_id -> steam_id, thumbnail -> thumbnail
         //   c. Else, set default info for save_path, publisher, developer, saves and then do 1.b.
-        // 
+        //
     }
     fn print_info(&self) {
         println!(
@@ -195,8 +194,9 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                         let acf_file = File::open(entry.path());
                         if let Ok(the_file) = acf_file {
                             let reader = BufReader::new(the_file);
-                            let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
-                            if filter_banned_games(&game_name){
+                            let (app_id, thumbnail, game_name) =
+                                parse_acf_files(thumb_path, reader);
+                            if filter_banned_games(&game_name) {
                                 continue;
                             }
                             // As long as they all exist, create the struct instance
@@ -315,7 +315,7 @@ pub fn gen_home() -> Option<PathBuf> {
     }
 }
 
-pub fn discover_steamgames(verbose: bool) -> Vec<SteamGame>{
+pub fn discover_steamgames(verbose: bool) -> Vec<SteamGame> {
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
