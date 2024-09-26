@@ -58,5 +58,8 @@ fn main() {
     // After modifications, write the `games` vector back to the configuration file
     write_conf(games, &game_conf_path);
     let discovered_games = discover_steamgames(false);
-    write_conf(discovered_games, home_dir.join(".config/oxi/steam_games.json").as_path())
+    write_conf(
+        discovered_games,
+        home_dir.join(".config/oxi/steam_games.json").as_path(),
+    )
 }

@@ -73,7 +73,8 @@ mod tests {
                         "parent_game": "Test Game",
                         "saved_at": "2024-03-30T15:00:00Z"
                     }
-                ]
+                ],
+                "thumbnail": []
             }
         ]
         "#;
@@ -118,7 +119,8 @@ mod tests {
                         "parent_game": "Test Game",
                         "saved_at": "2024-03-30T15:00:00Z"
                     }
-                ]
+                ],
+                "thumbnail": [ ]
             }
         ]
         "#;
@@ -164,7 +166,8 @@ mod tests {
                         "parent_game": "Test Game,
                         "saved_at": "2024-03-30T15:00:00Z"
                     }
-                ]
+                ],
+                "thumbnail": []
             }
         ]
         "#;
