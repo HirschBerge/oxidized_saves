@@ -61,7 +61,7 @@ mod tests {
         [
             {
                 "game_title": "Test Game",
-                "steam_id": 12345,
+                "game_id": 12345,
                 "save_path": "/home/user/saves/test_game",
                 "publisher": "Test Publisher",
                 "developer": "Test Developer",
@@ -107,7 +107,7 @@ mod tests {
         [
             {
                 "game_title": "Test Game",
-                "steam_id": 12345,
+                "game_id": 12345,
                 "save_path": "/home/user/saves/test_game",
                 "publisher": "Test Publisher",
                 "developer": "Test Developer",
@@ -142,8 +142,8 @@ mod tests {
         // Check if the result contains the expected game title
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].game_title, "Test Game");
-        assert_eq!(result[0].publisher, "Test Publisher");
-        assert_eq!(result[0].saves[0].count, 2);
+        assert_eq!(result[0].publisher.as_deref(), Some("Test Publisher"));
+        assert_eq!(result[0].saves.as_ref().unwrap()[0].count, 2);
     }
 
     #[test]

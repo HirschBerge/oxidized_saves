@@ -62,3 +62,17 @@ where
         }
     }
 }
+
+/**
+# Usecase
+Just Generates an expanded ~/
+*/
+pub fn gen_home() -> Option<PathBuf> {
+    match dirs::home_dir() {
+        Some(path) => Some(path),
+        None => {
+            println!("Unable to determine home directory.");
+            None
+        }
+    }
+}

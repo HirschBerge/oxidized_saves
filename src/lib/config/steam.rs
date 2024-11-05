@@ -1,62 +1,10 @@
-use crate::config::game::Game;
+use crate::config::{game::Game, gen_home};
 use core::panic;
-use serde::{Deserialize, Serialize};
 use std::{
-    fs::{self, File},
     io::{BufRead, BufReader},
+    fs::File,
     path::{Path, PathBuf},
 };
-
-#[allow(dead_code)]
-#[derive(Debug, Serialize, Deserialize)]
-// TODO: Make better interoptability with `Game`, or merge `SteamGame` and `Game` together
-pub struct SteamGame {
-    game_name: String,
-    app_id: u64,
-    thumbnail: Vec<PathBuf>,
-}
-impl SteamGame {
-    #[allow(dead_code)]
-    fn convert_to_game(&self) -> Game {
-        todo!();
-        // TODO:
-        // 1. Determine if Game struct instance with identical Game.game_title exists.
-        //   a. If SteamGame content is identical, skip
-        //   b. If exists and not identical, update information app_id -> steam_id, thumbnail -> thumbnail
-        //   c. Else, set default info for save_path, publisher, developer, saves and then do 1.b.
-        //
-    }
-    fn print_info(&self) {
-        println!(
-            "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon:",
-            self.game_name, self.app_id,
-        );
-        for thumb in &self.thumbnail {
-            println!("\t\x1b[32m{}\x1b[0m", thumb.to_string_lossy());
-        }
-    }
-    /**
-    # Usecase
-    Generates a `Option<PathBuf>` that represents the Proton C Drive which can be used as a starting location when selecting a save path.
-    */
-    #[allow(dead_code)]
-    fn find_compatdata(&self) -> Option<PathBuf> {
-        let home_dir = gen_home().expect("All OSes should have a home directory.");
-        let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
-        let steam_paths = extract_steampath(steam_lib);
-        for path in steam_paths {
-            // NOTE: drilling further into proton path due to too many symlinks
-            let combined_path = path.join(format!(
-                "compatdata/{}/pfx/drive_c/pfx/drive_c/users/steamuser/",
-                self.app_id
-            ));
-            if let Ok(_meta) = fs::metadata(&combined_path) {
-                return Some(combined_path);
-            }
-        }
-        Some(home_dir)
-    }
-}
 /// # Description:
 /// Contains a list of banned game titles (entirely non-game steam/proton-related tools) and, given a title, returns a `bool` based on if they are on the ban list
 fn filter_banned_games(title: &Option<String>) -> bool {
@@ -68,7 +16,7 @@ fn filter_banned_games(title: &Option<String>) -> bool {
     }
 }
 /**
- Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
+ Parses the contents of an .acf file and extracts relevant information for a `Game` instance.
 
  # Arguments
 
@@ -99,9 +47,9 @@ fn filter_banned_games(title: &Option<String>) -> bool {
 pub fn parse_acf_files(
     thumb_path: &Path,
     reader: BufReader<File>,
-) -> (Option<u64>, Option<Vec<PathBuf>>, Option<String>) {
-    // Initiate variables for SteamGame
-    let mut app_id: Option<u64> = None;
+) -> (Option<u32>, Option<Vec<PathBuf>>, Option<String>) {
+    // Initiate variables for Game
+    let mut app_id: Option<u32> = None;
     let mut thumbnails: Option<Vec<PathBuf>> = Some(Vec::new());
     let mut game_name: Option<String> = None;
 
@@ -161,7 +109,7 @@ pub fn parse_acf_files(
     (app_id, thumbnails, game_name)
 }
 
-/** Returns a vector of `SteamGame` instances parsed from .acf files in the specified directory.
+/** Returns a vector of `Game` instances parsed from .acf files in the specified directory.
 
  # Arguments
 
@@ -170,7 +118,7 @@ pub fn parse_acf_files(
 
  # Returns
 
- An `Option` containing a vector of `SteamGame` instances if successful, or `None` if an error occurs.
+ An `Option` containing a vector of `Game` instances if successful, or `None` if an error occurs.
 
  # Examples
 
@@ -182,8 +130,8 @@ pub fn parse_acf_files(
  let steam_games = return_steamgames(directory_path, thumb_path);
  ```
 **/
-pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<SteamGame>> {
-    let mut steamgames: Vec<SteamGame> = Vec::new();
+pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<Game>> {
+    let mut steamgames: Vec<Game> = Vec::new();
     // Iterate over the entries in the directory
     match std::fs::read_dir(directory_path) {
         Ok(entries) => {
@@ -203,10 +151,14 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                             if let (Some(app_id), Some(thumbnail), Some(game_name)) =
                                 (app_id, thumbnail, game_name)
                             {
-                                let game = SteamGame {
-                                    app_id,
+                                let game = Game {
+                                    game_id: app_id,
                                     thumbnail,
-                                    game_name,
+                                    game_title: game_name,
+                                    developer: None,
+                                    publisher: None,
+                                    save_path: None,
+                                    saves: None,
                                 };
                                 steamgames.push(game);
                             }
@@ -226,7 +178,7 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
     }
 }
 /**
-Parses the contents of an .acf file and extracts relevant information for a `SteamGame` instance.
+Parses the contents of an .acf file and extracts relevant information for a `Game` instance.
 
 # Arguments
 
@@ -289,8 +241,8 @@ pub fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
     extracted_libraries
 }
 
-fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) -> Vec<SteamGame> {
-    let mut combined_steamgames: Vec<SteamGame> = Vec::new();
+fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) -> Vec<Game> {
+    let mut combined_steamgames: Vec<Game> = Vec::new();
     for libraries in &extracted_libraries {
         if let Some(steamgames) = return_steamgames(libraries, &thumb_path) {
             combined_steamgames.extend(steamgames);
@@ -301,21 +253,8 @@ fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) ->
     }
     combined_steamgames
 }
-/**
-# Usecase
-Just Generates an expanded ~/
-*/
-pub fn gen_home() -> Option<PathBuf> {
-    match dirs::home_dir() {
-        Some(path) => Some(path),
-        None => {
-            println!("Unable to determine home directory.");
-            None
-        }
-    }
-}
 
-pub fn discover_steamgames(verbose: bool) -> Vec<SteamGame> {
+pub fn discover_steamgames(verbose: bool) -> Vec<Game> {
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
@@ -326,7 +265,7 @@ pub fn discover_steamgames(verbose: bool) -> Vec<SteamGame> {
         libraries.len()
     );
     if verbose {
-        libraries.sort_by(|a, b| a.game_name.cmp(&b.game_name));
+        libraries.sort_by(|a, b| a.game_title.cmp(&b.game_title));
         libraries.iter().for_each(|game| game.print_info());
     }
     libraries

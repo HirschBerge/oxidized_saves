@@ -1,6 +1,7 @@
 use oxi::config::{
     game::Game,
-    steam::{discover_steamgames, gen_home},
+    gen_home,
+    steam::discover_steamgames,
     verify_conf, write_conf,
 };
 use oxi::settings::Settings;
