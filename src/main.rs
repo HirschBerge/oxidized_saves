@@ -1,9 +1,4 @@
-use oxi::config::{
-    game::Game,
-    gen_home,
-    steam::discover_steamgames,
-    verify_conf, write_conf,
-};
+use oxi::config::{game::Game, gen_home, steam::discover_steamgames, verify_conf, write_conf};
 use oxi::settings::Settings;
 use std::path::PathBuf;
 

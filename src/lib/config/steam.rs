@@ -1,8 +1,8 @@
 use crate::config::{game::Game, gen_home};
 use core::panic;
 use std::{
-    io::{BufRead, BufReader},
     fs::File,
+    io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
 /// # Description:
