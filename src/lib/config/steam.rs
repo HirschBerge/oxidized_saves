@@ -260,8 +260,11 @@ pub fn discover_steamgames(verbose: bool) -> Vec<Game> {
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
     let steam_paths = extract_steampath(steam_lib.clone());
     let mut libraries = combine_steampaths(steam_paths, steam_thumb);
+    libraries.iter_mut().for_each(|game| {
+        game.find_compatdata();
+    });
     println!(
-        "\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!",
+        "\x1b[34mWe have found \x1b[31m{}\x1b[34m Steam games on your system!\x1b[0m ",
         libraries.len()
     );
     if verbose {

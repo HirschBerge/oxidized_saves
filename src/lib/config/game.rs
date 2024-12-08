@@ -25,31 +25,35 @@ impl Game {
             "\x1b[34mTitle\x1b[31m: {}\n\x1b[34mApp ID\x1b[35m: {}\n\x1b[34mPath to Icon:",
             self.game_title, self.game_id,
         );
-        for thumb in &self.thumbnail {
-            println!("\t\x1b[32m{}\x1b[0m", thumb.to_string_lossy());
-        }
+        self.thumbnail
+            .iter()
+            .for_each(|thumb| println!("\t\x1b[32m{}\x1b[0m", thumb.to_string_lossy()))
     }
     /**
     # Usecase
     Generates a `Option<PathBuf>` that represents the Proton C Drive which can be used as a starting location when selecting a save path.
     */
     #[allow(dead_code)]
-    fn find_compatdata(&self) -> Option<PathBuf> {
+    pub fn find_compatdata(&mut self) {
         let home_dir = gen_home().expect("All OSes should have a home directory.");
         let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
         let steam_paths = steam::extract_steampath(steam_lib);
-        for path in steam_paths {
+        let path = steam_paths.iter().find_map(|steam_path| {
             // NOTE: drilling further into proton path due to too many symlinks
-            let combined_path = path.join(format!(
-                "compatdata/{}/pfx/drive_c/pfx/drive_c/users/steamuser/",
+            let path = steam_path.join(format!(
+                "compatdata/{}/pfx/drive_c/users/steamuser/",
                 self.game_id
             ));
-            if let Ok(_meta) = fs::metadata(&combined_path) {
-                return Some(combined_path);
+            if fs::metadata(&path).is_ok() {
+                Some(path)
+                // TODO: For linux native games, this doesn't find a path since it's not using proton and the compatdata obviously assumes proton.
+            } else {
+                None
             }
-        }
-        Some(home_dir)
+        });
+        self.save_path = path.or(Some(home_dir));
     }
+
     // https://docs.rs/fs_extra/latest/fs_extra/dir/fn.copy.html
     // TEST: Write exhaustive tests
     #[allow(dead_code)]
