@@ -73,7 +73,7 @@ pub fn parse_acf_files(
                         "_header.jpg",
                     ];
                     if let Some(ref mut thumbs) = thumbnails {
-                        for ending in &endings {
+                        endings.iter().for_each(|ending| {
                             let full_path =
                                 format!("{}/{}{}", thumb_path.to_string_lossy(), id, ending);
                             match Path::new(&full_path).exists() {
@@ -87,7 +87,7 @@ pub fn parse_acf_files(
                                     )
                                 }
                             }
-                        }
+                        })
                     }
                 }
             }
@@ -243,14 +243,14 @@ pub fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
 
 fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) -> Vec<Game> {
     let mut combined_steamgames: Vec<Game> = Vec::new();
-    for libraries in &extracted_libraries {
+    extracted_libraries.iter().for_each(|libraries| {
         if let Some(steamgames) = return_steamgames(libraries, &thumb_path) {
             combined_steamgames.extend(steamgames);
         } else {
             // Handle the case when return_steamgames returns None
             eprintln!("Failed to retrieve Steam games for {:?}", libraries);
         }
-    }
+    });
     combined_steamgames
 }
 
