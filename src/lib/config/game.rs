@@ -104,6 +104,7 @@ impl Game {
         game_title: "Elden Ring".to_string(),
         game_id: 1245620,
         save_path: Some(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/compatdata/1245620/")),
+        install_path: Some(PathBuf::from("/mnt/storage/SteamLibrary/steamapps/common/ELDEN RING/")),
         publisher: Some("Bandai Namco".to_string()),
         developer: Some("FROM Software".to_string()),
         saves: vec![].into(),

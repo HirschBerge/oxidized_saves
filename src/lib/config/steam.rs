@@ -47,9 +47,10 @@ fn filter_banned_games(title: &Option<String>) -> bool {
  use std::io::BufReader;
  use oxi::config::steam::parse_acf_files;
  let thumb_path = Path::new("./Cargo.lock");
+ let library = Path::new("./Cargo.lock");
  let file = File::open("./Cargo.toml").expect("Failed to open file");
  let reader = BufReader::new(file);
- let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+ let (install_dir, app_id, thumbnail, game_name) = parse_acf_files(library, thumb_path, reader);
  ```
 */
 pub fn parse_acf_files(
