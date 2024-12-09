@@ -1,10 +1,18 @@
 use crate::config::{game::Game, gen_home};
-use core::panic;
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Read},
     path::{Path, PathBuf},
 };
+
+use nom::{
+    bytes::complete::{tag, take_until},
+    character::complete::{char, multispace0, space0, space1},
+    combinator::map,
+    sequence::{delimited, separated_pair},
+    IResult,
+};
+
 /// # Description:
 /// Contains a list of banned game titles (entirely non-game steam/proton-related tools) and, given a title, returns a `bool` based on if they are on the ban list
 fn filter_banned_games(title: &Option<String>) -> bool {
@@ -39,64 +47,81 @@ fn filter_banned_games(title: &Option<String>) -> bool {
  use std::io::BufReader;
  use oxi::config::steam::parse_acf_files;
  let thumb_path = Path::new("./Cargo.lock");
+ let library = Path::new("./Cargo.lock");
  let file = File::open("./Cargo.toml").expect("Failed to open file");
  let reader = BufReader::new(file);
- let (app_id, thumbnail, game_name) = parse_acf_files(thumb_path, reader);
+ let (install_dir, app_id, thumbnail, game_name) = parse_acf_files(library, thumb_path, reader);
  ```
 */
 pub fn parse_acf_files(
+    library: &Path,
     thumb_path: &Path,
     reader: BufReader<File>,
-) -> (Option<u32>, Option<Vec<PathBuf>>, Option<String>) {
+) -> (
+    Option<PathBuf>,
+    Option<u32>,
+    Option<Vec<PathBuf>>,
+    Option<String>,
+) {
     // Initiate variables for Game
-    let mut app_id: Option<u32> = None;
     let mut thumbnails: Option<Vec<PathBuf>> = Some(Vec::new());
     let mut game_name: Option<String> = None;
+    let mut app_id = 0;
+    let mut install_dir = PathBuf::new();
 
     // Loop over the lines in the acf file
     for line in reader.lines().map_while(Result::ok) {
         // Pull out the app_id and generate the path for the thumbnail
-        if line.contains("\"appid\"") {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() >= 2 {
-                app_id = parts[1]
-                    .trim_matches(|c| c == '"' || c == '\'')
-                    .parse()
-                    .ok();
-                if let Some(id) = app_id {
-                    let endings = [
-                        "_library_600x900.jpg",
-                        "_icon.jpg",
-                        "_logo.png",
-                        "_library_hero.jpg",
-                        "_library_hero_blur.jpg",
-                        "_header.jpg",
-                    ];
-                    if let Some(ref mut thumbs) = thumbnails {
-                        endings.iter().for_each(|ending| {
-                            let full_path =
-                                format!("{}/{}{}", thumb_path.to_string_lossy(), id, ending);
-                            match Path::new(&full_path).exists() {
-                                true => thumbs.push(Path::new(&full_path).to_path_buf()),
-                                false => {
-                                    let home_dir = gen_home()
-                                        .expect("All OSes should have a home directory!??");
-                                    thumbs.push(
-                                        Path::new(&home_dir.join(".config/oxi/placeholder.png"))
-                                            .to_path_buf(),
-                                    )
-                                }
-                            }
-                        })
-                    }
+        if line.contains("\"installdir\"") {
+            install_dir = match parse_install_path(line.as_str(), library) {
+                Ok((_, path)) => path,
+                Err(e) => {
+                    eprintln!("Failed to parse out install_dir: {}", e);
+                    std::process::exit(1);
                 }
+            };
+        } else if line.contains("\"appid\"") {
+            (_, app_id) = match parse_app_id(line.as_str()) {
+                Ok(id) => id,
+                Err(e) => {
+                    eprintln!("Could not parse app_id into u32: {}", e);
+                    std::process::exit(1);
+                }
+            };
+            let endings = [
+                "_library_600x900.jpg",
+                "_icon.jpg",
+                "_logo.png",
+                "_library_hero.jpg",
+                "_library_hero_blur.jpg",
+                "_header.jpg",
+            ];
+            if let Some(ref mut thumbs) = thumbnails {
+                endings.iter().for_each(|ending| {
+                    let full_path =
+                        format!("{}/{}{}", thumb_path.to_string_lossy(), app_id, ending);
+                    match Path::new(&full_path).exists() {
+                        true => thumbs.push(Path::new(&full_path).to_path_buf()),
+                        false => {
+                            let home_dir =
+                                gen_home().expect("All OSes should have a home directory!??");
+                            thumbs.push(
+                                Path::new(&home_dir.join(".config/oxi/placeholder.png"))
+                                    .to_path_buf(),
+                            )
+                        }
+                    }
+                })
             }
         // Get the game_name
         } else if line.contains("\"name\"") {
-            let parts: Vec<&str> = line.split('"').collect();
-            if parts.len() >= 3 {
-                game_name = Some(parts[3].to_string());
-            }
+            game_name = match parse_name(line.as_str()) {
+                Ok((_, name)) => Some(name),
+                Err(e) => {
+                    eprintln!("Could not parse game name: {}", e);
+                    std::process::exit(1);
+                }
+            };
         }
     }
 
@@ -106,7 +131,7 @@ pub fn parse_acf_files(
         }
     }
 
-    (app_id, thumbnails, game_name)
+    (Some(install_dir), Some(app_id), thumbnails, game_name)
 }
 
 /** Returns a vector of `Game` instances parsed from .acf files in the specified directory.
@@ -130,10 +155,10 @@ pub fn parse_acf_files(
  let steam_games = return_steamgames(directory_path, thumb_path);
  ```
 **/
-pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec<Game>> {
+pub fn return_steamgames(library: &Path, thumb_path: &Path) -> Option<Vec<Game>> {
     let mut steamgames: Vec<Game> = Vec::new();
     // Iterate over the entries in the directory
-    match std::fs::read_dir(directory_path) {
+    match std::fs::read_dir(library) {
         Ok(entries) => {
             for entry in entries.flatten() {
                 // Check if the entry is a file with a .acf extension
@@ -142,8 +167,8 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                         let acf_file = File::open(entry.path());
                         if let Ok(the_file) = acf_file {
                             let reader = BufReader::new(the_file);
-                            let (app_id, thumbnail, game_name) =
-                                parse_acf_files(thumb_path, reader);
+                            let (install_path, app_id, thumbnail, game_name) =
+                                parse_acf_files(library, thumb_path, reader);
                             if filter_banned_games(&game_name) {
                                 continue;
                             }
@@ -155,6 +180,7 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
                                     game_id: app_id,
                                     thumbnail,
                                     game_title: game_name,
+                                    install_path,
                                     developer: None,
                                     publisher: None,
                                     save_path: None,
@@ -177,33 +203,46 @@ pub fn return_steamgames(directory_path: &Path, thumb_path: &Path) -> Option<Vec
         }
     }
 }
-/**
-Parses the contents of an .acf file and extracts relevant information for a `Game` instance.
 
-# Arguments
+fn read_file(path: PathBuf) -> String {
+    let file = File::open(path).expect("Failed to open file");
+    let mut reader = BufReader::new(file);
+    let mut content = String::new();
+    reader
+        .read_to_string(&mut content)
+        .expect("Failed to read file");
 
-- `thumb_path` - A reference to the directory containing game thumbnails.
-- `reader` - A buffered reader for the .acf file.
+    // Replace escape sequences with their literal equivalents
+    content
+}
 
-# Returns
+pub fn parse_app_id(input: &str) -> IResult<&str, u32> {
+    let (input, _) = separated_pair(multispace0, tag("\"appid\""), multispace0)(input)?;
+    let (input, app_id) = delimited(char('"'), nom::character::complete::u32, char('"'))(input)?;
+    Ok((input, app_id))
+}
 
-A tuple containing the extracted information: `(app_id, thumbnail, game_name)`.
-Each item in the tuple is an `Option`:
-- `app_id`: The Steam application ID.
-- `thumbnail`: The path to the game thumbnail.
-- `game_name`: The name of the game.
+pub fn parse_install_path<'a>(input: &'a str, library: &'a Path) -> IResult<&'a str, PathBuf> {
+    let (input, _) = separated_pair(space0, tag("\"installdir\""), space1)(input)?;
+    let (input, path) = map(
+        delimited(char('"'), take_until("\""), char('"')),
+        |path: &str| library.join(format!("common/{}", path)),
+    )(input)?;
+    Ok((input, path))
+}
 
-# Examples
-**/
-fn read_file(path: PathBuf) -> File {
-    // Open the file
-    match File::open(path) {
-        Ok(file) => file,
-        Err(_) => {
-            eprintln!("Failed to open file.");
-            panic!();
-        }
-    }
+pub fn parse_name(input: &str) -> IResult<&str, String> {
+    let (input, _) = separated_pair(space0, tag("\"name\""), space1)(input)?;
+    let (input, game_name) = delimited(char('"'), take_until("\""), char('"'))(input)?;
+    Ok((input, game_name.to_string()))
+}
+pub fn parse_path(input: &str) -> IResult<&str, PathBuf> {
+    let (input, _) = separated_pair(space0, tag("\"path\""), space1)(input)?;
+    let (input, path) = map(
+        delimited(char('"'), take_until("\""), char('"')),
+        |path: &str| PathBuf::from(format!("{}/steamapps/", path)),
+    )(input)?;
+    Ok((input, path))
 }
 
 /**
@@ -216,45 +255,42 @@ Parses a file to extract Steam library paths.
 # Returns
 
 A vector containing the extracted Steam library paths.
-
-# Examples
-```
-use std::path::PathBuf;
-use oxi::config::steam::extract_steampath;
-let path = PathBuf::from("./Cargo.toml");
-let libraries = extract_steampath(path);
-```
 */
-pub fn extract_steampath(path: PathBuf) -> Vec<PathBuf> {
-    // Create a vector to store the extracted data
-    let mut extracted_libraries: Vec<PathBuf> = Vec::new();
-    let file = read_file(path);
-    // Read the file .line by line and extract data
-    let reader = BufReader::new(file);
-    for line in reader.lines().map_while(Result::ok) {
+pub fn extract_steampath(file_path: PathBuf) -> Vec<PathBuf> {
+    let content = read_file(file_path);
+    let mut extracted_paths = Vec::new();
+
+    for line in content.lines() {
         if line.contains("path") {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            let cleaned_path = parts[1].trim_matches(|c| c == '"' || c == '\'');
-            extracted_libraries.push(PathBuf::from(format!("{}/steamapps/", cleaned_path)));
+            let (_, path) = match parse_path(line) {
+                Ok(path) => path,
+                Err(e) => {
+                    eprintln!("{}", e);
+                    std::process::exit(1);
+                }
+            };
+            extracted_paths.push(path);
         }
     }
-    extracted_libraries
+
+    extracted_paths
 }
 
 fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) -> Vec<Game> {
     let mut combined_steamgames: Vec<Game> = Vec::new();
-    extracted_libraries.iter().for_each(|libraries| {
-        if let Some(steamgames) = return_steamgames(libraries, &thumb_path) {
+    extracted_libraries.iter().for_each(|library| {
+        if let Some(steamgames) = return_steamgames(library, &thumb_path) {
             combined_steamgames.extend(steamgames);
         } else {
             // Handle the case when return_steamgames returns None
-            eprintln!("Failed to retrieve Steam games for {:?}", libraries);
+            eprintln!("Failed to retrieve Steam games for {:?}", library);
         }
     });
     combined_steamgames
 }
 
 pub fn discover_steamgames(verbose: bool) -> Vec<Game> {
+    // TODO: Add data only for new games (aka not in config file) or upon force requested by user
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");
     let steam_thumb: PathBuf = home_dir.join(".local/share/Steam/appcache/librarycache");
