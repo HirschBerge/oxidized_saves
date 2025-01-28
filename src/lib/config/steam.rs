@@ -89,17 +89,17 @@ pub fn parse_acf_files(
                 }
             };
             let endings = [
-                "_library_600x900.jpg",
-                "_icon.jpg",
-                "_logo.png",
-                "_library_hero.jpg",
-                "_library_hero_blur.jpg",
-                "_header.jpg",
+                "library_600x900.jpg",
+                "icon.jpg",
+                "logo.png",
+                "library_hero.jpg",
+                "library_hero_blur.jpg",
+                "header.jpg",
             ];
             if let Some(ref mut thumbs) = thumbnails {
                 endings.iter().for_each(|ending| {
                     let full_path =
-                        format!("{}/{}{}", thumb_path.to_string_lossy(), app_id, ending);
+                        format!("{}/{}/{}", thumb_path.to_string_lossy(), app_id, ending);
                     match Path::new(&full_path).exists() {
                         true => thumbs.push(Path::new(&full_path).to_path_buf()),
                         false => {
