@@ -1,4 +1,4 @@
-use oxi::config::steam::discover_steamgames;
+use oxi::config::steam::discover_games;
 
 fn main() {
     // Run registered benchmarks.
@@ -7,7 +7,7 @@ fn main() {
 
 #[divan::bench]
 fn bench_steam_discovery() {
-    discover_steamgames(false);
+    discover_games(false);
 }
 
 // #[divan::bench]

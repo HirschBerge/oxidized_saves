@@ -289,7 +289,7 @@ fn combine_steampaths(extracted_libraries: Vec<PathBuf>, thumb_path: PathBuf) ->
     combined_steamgames
 }
 
-pub fn discover_steamgames(verbose: bool) -> Vec<Game> {
+pub fn discover_games(verbose: bool) -> Vec<Game> {
     // TODO: Add data only for new games (aka not in config file) or upon force requested by user
     let home_dir = gen_home().expect("All OSes should have a home directory!??");
     let steam_lib: PathBuf = home_dir.join(".local/share/Steam/config/libraryfolders.vdf");

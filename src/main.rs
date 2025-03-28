@@ -1,4 +1,4 @@
-use oxi::config::{game::Game, gen_home, steam::discover_steamgames, verify_conf, write_conf};
+use oxi::config::{game::Game, gen_home, steam::discover_games, verify_conf, write_conf};
 use oxi::settings::Settings;
 use std::path::PathBuf;
 
@@ -53,8 +53,8 @@ fn main() {
 
     // After modifications, write the `games` vector back to the configuration file
     write_conf(games, &game_conf_path);
-    let discovered_games = discover_steamgames(false);
-    // TEST: Shows layout of SteamGame. Here to debug when implementing merger
+    let discovered_games = discover_games(false);
+    // TEST: Shows layout of Game. Here to debug when implementing merger
     write_conf(
         discovered_games,
         home_dir.join(".config/oxi/steam_games.json").as_path(),
