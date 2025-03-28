@@ -45,7 +45,7 @@ The development of Oxidized Save Manager will be divided into the following mile
 - [X] Pull list of games from SteamDB
 - [X] Pull out the game icons from the Steam db
 - [X] Present images and games
-- [ ] Cleanly convert SteamGame type to Game type
+- [x] Cleanly convert SteamGame type to Game type
 - [ ] Possibly show a compatibility indicator.
 - [ ] Possibly show a ProtonDB indicator.
 
@@ -91,4 +91,3 @@ Here's a breakdown of tasks to be completed for each milestone:
 
 ## Conclusion
 The RoadMap provides a structured plan for the development of the GUI Game Save Manager. As progress is made on each milestone and task, updates will be reflected in this document.
-
