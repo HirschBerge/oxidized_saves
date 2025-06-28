@@ -1,3 +1,4 @@
+use oxi::config::create_config;
 use oxi::config::{game::Game, gen_home, steam::discover_games, verify_conf, write_conf};
 use oxi::settings::Settings;
 use std::path::PathBuf;
@@ -36,6 +37,9 @@ fn main() {
     let home_dir = gen_home().expect("All OSes should have a home dir??");
     // Append the relative path to the user's home directory
     let settings_file = &home_dir.join(".config/oxi/oxi.json");
+    if !settings_file.exists() {
+        create_config();
+    }
     let prog_settings: &mut Settings =
         &mut verify_conf::<Vec<Settings>>(settings_file.to_path_buf())[0];
     let expanded_saves = PathBuf::from(format!(
