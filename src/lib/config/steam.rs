@@ -205,15 +205,21 @@ pub fn return_steamgames(library: &Path, thumb_path: &Path) -> Option<Vec<Game>>
 }
 
 fn read_file(path: PathBuf) -> String {
-    let file = File::open(path).expect("Failed to open file");
-    let mut reader = BufReader::new(file);
-    let mut content = String::new();
-    reader
-        .read_to_string(&mut content)
-        .expect("Failed to read file");
+    match File::open(path) {
+        Ok(opened_file) => {
+            let mut reader = BufReader::new(opened_file);
+            let mut content = String::new();
+            reader
+                .read_to_string(&mut content)
+                .expect("Failed to read file");
 
-    // Replace escape sequences with their literal equivalents
-    content
+            content
+        }
+        Err(e) => {
+            eprintln!("Encountered error: {}.", e);
+            panic!("Is steam installed?")
+        }
+    }
 }
 
 pub fn parse_app_id(input: &str) -> IResult<&str, u32> {
