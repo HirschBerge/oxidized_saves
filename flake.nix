@@ -47,5 +47,18 @@
         ];
       };
     });
+    packages = forEachSupportedSystem ({pkgs}: {
+      default = pkgs.rustPlatform.buildRustPackage {
+        pname = "oxidized_saves";
+        version = "0.1.0"; # Should match your Cargo.toml version
+        # The `src` is the flake's own directory
+        src = self;
+        cargoLock = {
+          lockFile = ./Cargo.lock;
+        };
+        nativeBuildInputs = with pkgs; [pkg-config];
+        buildInputs = with pkgs; [openssl];
+      };
+    });
   };
 }
