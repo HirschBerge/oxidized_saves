@@ -2,12 +2,14 @@
   description = "A Nix-flake-based Rust development environment";
 
   inputs = {
+    naersk.url = "github:nix-community/naersk";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
   outputs = {
     self,
+    naersk,
     nixpkgs,
     rust-overlay,
   }: let
@@ -47,17 +49,19 @@
         ];
       };
     });
-    packages = forEachSupportedSystem ({pkgs}: {
-      default = pkgs.rustPlatform.buildRustPackage {
+    packages = forEachSupportedSystem ({pkgs}: let
+      naersklib = pkgs.callPackage naersk {};
+    in {
+      default = naersklib.buildPackage {
         pname = "oxidized_saves";
         version = "0.1.0"; # Should match your Cargo.toml version
         # The `src` is the flake's own directory
         src = self;
-        cargoLock = {
-          lockFile = ./Cargo.lock;
-        };
         nativeBuildInputs = with pkgs; [pkg-config];
         buildInputs = with pkgs; [openssl];
+        postInstall = ''
+          ln -s $out/bin/oxidized_saves $out/bin/oxi
+        '';
       };
     });
   };
